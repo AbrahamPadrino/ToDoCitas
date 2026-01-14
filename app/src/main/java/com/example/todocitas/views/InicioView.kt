@@ -53,6 +53,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.todocitas.R
@@ -63,6 +64,7 @@ import com.example.todocitas.ui.theme.BorderDark
 import com.example.todocitas.ui.theme.CardDark
 import com.example.todocitas.ui.theme.Primary
 import com.example.todocitas.ui.theme.TextSecondary
+import com.example.todocitas.ui.theme.ToDoCitasTheme
 
 //@OptIn(ExperimentalMaterial3Api::class)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -491,5 +493,13 @@ fun ItemCita(cita: Cita) {
                 tint = Color.Gray
             )
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun InicioViewPreview() {
+    ToDoCitasTheme(darkTheme = true) {
+        InicioView()
     }
 }

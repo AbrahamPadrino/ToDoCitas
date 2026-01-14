@@ -24,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.todocitas.R // Asegúrate de importar tus recursos
+import com.example.todocitas.components.SearchBar
 import com.example.todocitas.models.Cliente
 import com.example.todocitas.ui.theme.*
 
@@ -78,6 +79,7 @@ fun ListaClientesView(
             SearchBar(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
+                placeholder = "Buscar cliente...",
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp)
@@ -104,38 +106,7 @@ fun ListaClientesView(
     }
 }
 
-@Composable
-fun SearchBar(
-    value: String,
-    onValueChange: (String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    TextField(
-        value = value,
-        onValueChange = onValueChange,
-        modifier = modifier.height(52.dp),
-        placeholder = { Text("Buscar cliente...", color = TextSecondary) },
-        leadingIcon = {
-            Icon(
-                Icons.Default.Search,
-                contentDescription = null,
-                tint = TextSecondary
-            )
-        },
-        shape = RoundedCornerShape(12.dp),
-        colors = TextFieldDefaults.colors(
-            focusedContainerColor = CardDark,
-            unfocusedContainerColor = CardDark,
-            disabledContainerColor = CardDark,
-            focusedTextColor = Color.White,
-            unfocusedTextColor = Color.White,
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-            disabledIndicatorColor = Color.Transparent
-        ),
-        singleLine = true
-    )
-}
+
 
 @Composable
 fun ClientCard(cliente: Cliente) {
