@@ -1,28 +1,28 @@
 package com.example.todocitas
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.todocitas.navigation.NavManager
 import com.example.todocitas.ui.theme.ToDoCitasTheme
-import com.example.todocitas.views.InicioView
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint // Indica que esta clase es un punto de entrada de Hilt
 @Suppress("DEPRECATION")
 class MainActivity : ComponentActivity() {
+    @SuppressLint("ViewModelConstructorInComposable")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -41,15 +41,14 @@ class MainActivity : ComponentActivity() {
                     darkIcons = false // <-- Los íconos en blanco.
                 )
             }
-            //
+                //
             ToDoCitasTheme {
 
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    // --- Aquí llamas a tu vista principal ---
-                    InicioView()
+                    NavManager()
                 }
             }
         }
@@ -61,6 +60,6 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun GreetingPreview() {
     ToDoCitasTheme {
-        //
+        NavManager()
     }
 }

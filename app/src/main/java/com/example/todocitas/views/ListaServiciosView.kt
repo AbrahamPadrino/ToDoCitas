@@ -18,13 +18,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.todocitas.components.SearchBar
-import com.example.todocitas.models.Servicio
+import com.example.todocitas.data.local.entities.Servicio
 import com.example.todocitas.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -32,7 +34,8 @@ import com.example.todocitas.ui.theme.*
 fun ListaServiciosView(
     onBack: () -> Unit,
     onAddNewService: () -> Unit,
-    servicios: List<Servicio>
+    servicios: List<Servicio>,
+    navController: NavController
 ) {
     var searchQuery by remember { mutableStateOf("") }
 
@@ -178,7 +181,8 @@ fun ListaServiciosViewPreview() {
         ListaServiciosView(
             onBack = {},
             onAddNewService = {},
-            servicios = sampleServices
+            servicios = sampleServices,
+            navController = NavController(LocalContext.current)
         )
     }
 }

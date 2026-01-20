@@ -27,12 +27,17 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.todocitas.components.CustomTextField
 import com.example.todocitas.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NuevoClienteView(onBack: () -> Unit) {
+fun NuevoClienteView(
+    navController: NavController,
+    onBack: () -> Unit
+) {
     var nombre by remember { mutableStateOf("") }
     var apellido by remember { mutableStateOf("") }
     var correo by remember { mutableStateOf("") }
@@ -210,7 +215,10 @@ fun NuevoClienteView(onBack: () -> Unit) {
 @Composable
 fun NuevoClienteViewPreview() {
     ToDoCitasTheme {
-        NuevoClienteView(onBack = {})
+        NuevoClienteView(
+            navController = rememberNavController(),
+            onBack = {}
+        )
     }
 }
 

@@ -1,11 +1,11 @@
-package com.example.todocitas.data.local.room
+package com.example.todocitas.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
-import com.example.todocitas.models.Cliente
+import com.example.todocitas.data.local.entities.Cliente
 import kotlinx.coroutines.flow.Flow
 
 @Dao
