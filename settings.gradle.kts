@@ -7,8 +7,9 @@ pluginManagement {
                 includeGroupByRegex("androidx.*")
             }
         }
+
         mavenCentral()
-        gradlePluginPortal()
+        gradlePluginPortal() // Util para Hilt
     }
 }
 dependencyResolutionManagement {

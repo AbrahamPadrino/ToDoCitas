@@ -25,7 +25,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.todocitas.R // Asegúrate de importar tus recursos
+import com.example.todocitas.R
+//import com.example.todocitas.R // Asegúrate de importar tus recursos
 import com.example.todocitas.components.SearchBar
 import com.example.todocitas.data.local.entities.Cliente
 import com.example.todocitas.ui.theme.*
@@ -127,7 +128,7 @@ fun ClientCard(cliente: Cliente) {
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Image(
-                painter = painterResource(id = cliente.imagenResId),
+                painter = painterResource(id = R.drawable.profile1),
                 contentDescription = "Foto de ${cliente.nombre}",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -232,9 +233,9 @@ fun EmptyState(isEndOfList: Boolean = false) {
 fun ListaClientesViewPreview() {
     // Datos de ejemplo para la preview
     val sampleClients = listOf(
-        Cliente(1, "Ana García Pérez", "+34 600 123 456", R.drawable.profile1), // Reemplaza con tus imágenes
-        Cliente(2, "Carlos Martinez", "+34 601 234 567", R.drawable.profile2),
-        Cliente(3, "Laura Fernandez", "+34 602 345 678", R.drawable.profile10)
+        Cliente(1, "Ana García Pérez", "+34 600 123 456", "R.drawable.profile1"), // Reemplaza con tus imágenes o la URI de tu recurso
+        Cliente(2, "Carlos Martinez", "+34 601 234 567", "R.drawable.profile2"),
+        Cliente(3, "Laura Fernandez", "+34 602 345 678", "R.drawable.profile10")
     )
     ToDoCitasTheme {
         ListaClientesView(

@@ -2,9 +2,16 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    // Hilt
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+}
+
+/* Le indica a Hilt que no use su sistema de compilación (RapidaEspecial).
+* En otras palabras se indica que utilice la forma clasica de compilar.
+* Especialmente para evitar conflictos con versiones de kotlin > 2+
+*/
+hilt{
+    enableAggregatingTask = false
 }
 
 android {
@@ -65,9 +72,8 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     // Hilt
     implementation(libs.hilt.android)
-    ksp(libs.hilt.android.compiler)
-    implementation(libs.androidx.hilt.navigation.compose)
-    ksp(libs.androidx.hilt.compiler)
+    ksp(libs.hilt.compiler)
+    implementation(libs.hilt.navigation.compose)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
