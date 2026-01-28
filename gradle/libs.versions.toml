@@ -41,6 +41,9 @@ androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "
 androidx-runtime-livedata = { module = "androidx.compose.runtime:runtime-livedata", version.ref = "runtimeLivedata" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 
+androidx-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" } # Icons
+
+
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hiltVersion" }  # Libreria principal de Hilt para DI
 hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hiltVersion" } # Procesador de Anotaciones de Hilt
 hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltNavigationCompose"} # Navigation Component para Hilt
