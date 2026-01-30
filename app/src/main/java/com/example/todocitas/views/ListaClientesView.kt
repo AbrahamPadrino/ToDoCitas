@@ -8,7 +8,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -26,7 +25,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.todocitas.R
-//import com.example.todocitas.R // Asegúrate de importar tus recursos
 import com.example.todocitas.components.SearchBar
 import com.example.todocitas.data.local.entities.Cliente
 import com.example.todocitas.ui.theme.*
@@ -37,14 +35,15 @@ fun ListaClientesView(
     onBack: () -> Unit,
     onAddNewClient: () -> Unit,
     clientes: List<Cliente>,
-    navController: NavController
+    navController: NavController,
+    openDrawer: () -> Unit
 ) {
     var searchQuery by remember { mutableStateOf("") }
 
     Scaffold(
         containerColor = BackgroundDark,
         topBar = {
-            TopAppBar(
+            CenterAlignedTopAppBar(
                 title = {
                     Text(
                         "Lista de Clientes",
@@ -55,11 +54,12 @@ fun ListaClientesView(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
+                    IconButton(onClick = openDrawer) {
                         Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver",
-                            tint = Color.White
+                            Icons.Default.Menu,
+                            contentDescription = "Menu",
+                            tint = Color.White,
+                            modifier = Modifier.size(28.dp)
                         )
                     }
                 },
@@ -242,7 +242,8 @@ fun ListaClientesViewPreview() {
             onBack = {},
             onAddNewClient = {},
             clientes = sampleClients,
-            navController = NavController(LocalContext.current)
+            navController = NavController(LocalContext.current),
+            openDrawer = {}
         )
     }
 }
@@ -255,7 +256,8 @@ fun ListaClientesEmptyPreview() {
             onBack = {},
             onAddNewClient = {},
             clientes = emptyList(),
-            navController = NavController(LocalContext.current)
+            navController = NavController(LocalContext.current),
+            openDrawer = {}
         )
     }
 }

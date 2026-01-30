@@ -1,6 +1,5 @@
 package com.example.todocitas.views
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -68,11 +67,11 @@ import com.example.todocitas.ui.theme.Primary
 import com.example.todocitas.ui.theme.TextSecondary
 import com.example.todocitas.ui.theme.ToDoCitasTheme
 
-//@OptIn(ExperimentalMaterial3Api::class)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InicioView(
-    navController: NavController
+    navController: NavController,
+    openDrawer: () -> Unit
 ) {
     Scaffold(
         containerColor = BackgroundDark,
@@ -87,7 +86,7 @@ fun InicioView(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { /* Menu action */ }) {
+                    IconButton(onClick = openDrawer) {
                         Icon(
                             Icons.Default.Menu,
                             contentDescription = "Menu",
@@ -504,7 +503,9 @@ fun ItemCita(cita: Cita) {
 @Composable
 fun InicioViewPreview() {
     ToDoCitasTheme(darkTheme = true) {
-        InicioView(NavController(LocalContext.current)
+        InicioView(
+            NavController(LocalContext.current),
+            openDrawer = {}
         )
     }
 }

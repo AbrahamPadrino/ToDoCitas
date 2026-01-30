@@ -6,8 +6,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -29,8 +29,9 @@ import com.example.todocitas.ui.theme.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NuevoServicioView(
-    navController: NavController,
     onBack: () -> Unit,
+    navController: NavController,
+    openDrawer: () -> Unit,
     onSaveService: (Servicio) -> Unit = {}
 ) {
 
@@ -41,7 +42,7 @@ fun NuevoServicioView(
     Scaffold(
         containerColor = BackgroundDark,
         topBar = {
-            TopAppBar(
+            CenterAlignedTopAppBar(
                 title = {
                     Text(
                         "Nuevo Servicio",
@@ -52,11 +53,12 @@ fun NuevoServicioView(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
+                    IconButton(onClick = openDrawer) {
                         Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver",
-                            tint = Color.White // El diseño original lo muestra en color primario, pero en dark theme se ve mejor blanco.
+                            Icons.Default.Menu,
+                            contentDescription = "menu",
+                            tint = Color.White, // El diseño original lo muestra en color primario, pero en dark theme se ve mejor blanco.
+                            modifier = Modifier.size(28.dp)
                         )
                     }
                 },
@@ -181,6 +183,7 @@ fun NuevoServicioViewPreview() {
     ToDoCitasTheme {
         NuevoServicioView(
             navController = NavController(LocalContext.current),
+            openDrawer = {},
             onBack = {}
         )
     }

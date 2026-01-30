@@ -8,7 +8,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -35,14 +34,15 @@ fun ListaServiciosView(
     onBack: () -> Unit,
     onAddNewService: () -> Unit,
     servicios: List<Servicio>,
-    navController: NavController
+    navController: NavController,
+    openDrawer: () -> Unit
 ) {
     var searchQuery by remember { mutableStateOf("") }
 
     Scaffold(
         containerColor = BackgroundDark,
         topBar = {
-            TopAppBar(
+            CenterAlignedTopAppBar(
                 title = {
                     Text(
                         "Lista de Servicios",
@@ -54,11 +54,12 @@ fun ListaServiciosView(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
+                    IconButton(onClick = openDrawer) {
                         Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver",
-                            tint = Primary
+                            Icons.Default.Menu,
+                            contentDescription = "Menu",
+                            tint = Color.White,
+                            modifier = Modifier.size(28.dp)
                         )
                     }
                 },
@@ -182,7 +183,8 @@ fun ListaServiciosViewPreview() {
             onBack = {},
             onAddNewService = {},
             servicios = sampleServices,
-            navController = NavController(LocalContext.current)
+            navController = NavController(LocalContext.current),
+            openDrawer = {}
         )
     }
 }

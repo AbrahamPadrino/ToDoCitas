@@ -7,13 +7,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
@@ -30,13 +29,16 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.todocitas.components.CustomTextField
+import com.example.todocitas.data.local.entities.Cliente
 import com.example.todocitas.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NuevoClienteView(
+    onBack: () -> Unit,
     navController: NavController,
-    onBack: () -> Unit
+    openDrawer: () -> Unit,
+    onSaveCliente: (Cliente) -> Unit = {}
 ) {
     var nombre by remember { mutableStateOf("") }
     var apellido by remember { mutableStateOf("") }
@@ -46,7 +48,7 @@ fun NuevoClienteView(
     Scaffold(
         containerColor = BackgroundDark,
         topBar = {
-            TopAppBar(
+            CenterAlignedTopAppBar(
                 title = {
                     Text(
                         "Nuevo Cliente",
@@ -55,11 +57,12 @@ fun NuevoClienteView(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
+                    IconButton(onClick = openDrawer) {
                         Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver",
-                            tint = Color.White
+                            Icons.Default.Menu,
+                            contentDescription = "menu",
+                            tint = Color.White,
+                            modifier = Modifier.size(28.dp)
                         )
                     }
                 },
@@ -217,7 +220,9 @@ fun NuevoClienteViewPreview() {
     ToDoCitasTheme {
         NuevoClienteView(
             navController = rememberNavController(),
-            onBack = {}
+            openDrawer = {},
+            onBack = {},
+            onSaveCliente = {}
         )
     }
 }
