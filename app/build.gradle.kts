@@ -69,6 +69,7 @@ dependencies {
     // ROOM
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
     // LiveData
     implementation(libs.androidx.runtime.livedata)
     // Navigation
