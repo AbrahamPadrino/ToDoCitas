@@ -1,7 +1,6 @@
 package com.example.todocitas.navigation
 
 import android.annotation.SuppressLint
-import androidx.activity.result.launch
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
@@ -18,8 +17,10 @@ import com.example.todocitas.ui.theme.BackgroundDark
 import com.example.todocitas.viewmodels.ClientesViewModel
 import com.example.todocitas.viewmodels.ServiciosViewModel
 import com.example.todocitas.views.InicioView
+import com.example.todocitas.views.ListaCitasView
 import com.example.todocitas.views.ListaClientesView
 import com.example.todocitas.views.ListaServiciosView
+import com.example.todocitas.views.NuevaCitaView
 import com.example.todocitas.views.NuevoClienteView
 import com.example.todocitas.views.NuevoServicioView
 import com.example.todocitas.views.components.DrawerContent
@@ -101,6 +102,13 @@ fun NavManager() {
                     navController = navController,
                     openDrawer = { scope.launch { drawerState.open() } }
                 )
+            }
+
+            composable(Views.ListaCitasView.route) {
+                ListaCitasView()
+            }
+            composable(Views.NuevaCitaView.route) {
+                NuevaCitaView()
             }
 
             composable(Views.NuevoClienteView.route) {

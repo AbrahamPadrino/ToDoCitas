@@ -6,7 +6,10 @@ sealed class Views(
     object InicioView: Views("inicio_view")
     object ListaClientesView: Views("lista_clientes_view")
     object ListaServiciosView: Views("lista_servicios_view")
+    object ListaCitasView: Views("lista_citas_view")
     object NuevoClienteView: Views("nuevo_cliente_view")
     object NuevoServicioView: Views("nuevo_servicio_view")
+    object NuevaCitaView: Views("nueva_cita_view")
+
 
 }

@@ -70,7 +70,22 @@ fun DrawerContent(
                     Views.NuevoServicioView.route
                 )
             )
+        ),
+                DrawerMenuSection(
+                "CITAS", listOf(
+            DrawerMenuItem(
+                Icons.Outlined.CalendarMonth,
+                "Listar Citas",
+                Views.ListaCitasView.route
+            ),
+            DrawerMenuItem(
+                Icons.Outlined.EditCalendar,
+                "Nueva Cita",
+                Views.NuevaCitaView.route
+            )
         )
+    )
+
         // Añade aquí más secciones como "MIS CITAS", "REPORTES", etc.
     )
 
