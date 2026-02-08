@@ -21,8 +21,11 @@ import com.example.todocitas.views.ListaCitasView
 import com.example.todocitas.views.ListaClientesView
 import com.example.todocitas.views.ListaServiciosView
 import com.example.todocitas.views.NuevaCitaView
+import com.example.todocitas.views.ReporteTicketView
 import com.example.todocitas.views.NuevoClienteView
 import com.example.todocitas.views.NuevoServicioView
+import com.example.todocitas.views.ReporteMensualView
+import com.example.todocitas.views.ReporteSemanalView
 import com.example.todocitas.views.components.DrawerContent
 import kotlinx.coroutines.launch
 
@@ -92,25 +95,6 @@ fun NavManager() {
                     openDrawer = { scope.launch { drawerState.open() } }
                 )
             }
-
-            composable(Views.ListaServiciosView.route) {
-
-                ListaServiciosView(
-                    onBack = { navController.popBackStack() },
-                    onAddNewService = { navController.navigate(Views.NuevoServicioView.route) },
-                    servicios = serviciosViewModel.serviciosState.listaServicios,
-                    navController = navController,
-                    openDrawer = { scope.launch { drawerState.open() } }
-                )
-            }
-
-            composable(Views.ListaCitasView.route) {
-                ListaCitasView()
-            }
-            composable(Views.NuevaCitaView.route) {
-                NuevaCitaView()
-            }
-
             composable(Views.NuevoClienteView.route) {
                 NuevoClienteView(
                     onBack = { navController.popBackStack() },
@@ -122,6 +106,16 @@ fun NavManager() {
                 )
             }
 
+            composable(Views.ListaServiciosView.route) {
+                ListaServiciosView(
+                    onBack = { navController.popBackStack() },
+                    onAddNewService = { navController.navigate(Views.NuevoServicioView.route) },
+                    servicios = serviciosViewModel.serviciosState.listaServicios,
+                    navController = navController,
+                    openDrawer = { scope.launch { drawerState.open() } }
+                )
+            }
+
             composable(Views.NuevoServicioView.route) {
                 NuevoServicioView(
                     navController = navController,
@@ -129,6 +123,21 @@ fun NavManager() {
                     onBack = { navController.popBackStack() },
                     onSaveService = { serviciosViewModel.guardarServicio(it) }
                 )
+            }
+            composable(Views.ListaCitasView.route) {
+                ListaCitasView()
+            }
+            composable(Views.NuevaCitaView.route) {
+                NuevaCitaView()
+            }
+            composable(Views.ReporteTicketView.route) {
+                ReporteTicketView()
+            }
+            composable(Views.ReporteSemanalView.route) {
+                ReporteSemanalView()
+            }
+            composable(Views.ReporteMensualView.route) {
+                ReporteMensualView()
             }
         }
     }

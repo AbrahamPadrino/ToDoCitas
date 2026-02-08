@@ -71,20 +71,39 @@ fun DrawerContent(
                 )
             )
         ),
-                DrawerMenuSection(
-                "CITAS", listOf(
-            DrawerMenuItem(
-                Icons.Outlined.CalendarMonth,
-                "Listar Citas",
-                Views.ListaCitasView.route
-            ),
-            DrawerMenuItem(
-                Icons.Outlined.EditCalendar,
-                "Nueva Cita",
-                Views.NuevaCitaView.route
+        DrawerMenuSection(
+            "MIS CITAS", listOf(
+                DrawerMenuItem(
+                    Icons.Outlined.CalendarMonth,
+                    "Listar Citas",
+                    Views.ListaCitasView.route
+                ),
+                DrawerMenuItem(
+                    Icons.Outlined.EditCalendar,
+                    "Nueva Cita",
+                    Views.NuevaCitaView.route
+                )
+            )
+        ),
+        DrawerMenuSection(
+            "REPORTES", listOf(
+                DrawerMenuItem(
+                    Icons.Outlined.ConfirmationNumber,
+                    "Ver Ticket",
+                    Views.ReporteTicketView.route
+                ),
+                DrawerMenuItem(
+                    Icons.Outlined.BarChart,
+                    "Resumen Semanal",
+                    Views.ReporteSemanalView.route
+                ),
+                DrawerMenuItem(
+                    Icons.Outlined.PieChart,
+                    "Resumen Mensual",
+                    Views.ReporteMensualView.route
+                )
             )
         )
-    )
 
         // Añade aquí más secciones como "MIS CITAS", "REPORTES", etc.
     )
@@ -226,7 +245,7 @@ private fun DrawerItem(
             color = contentColor,
             fontWeight = fontWeight,
             fontSize = if (isHeader) 14.sp else 14.sp,
-            letterSpacing = if(isHeader) 0.05.sp else 0.sp
+            letterSpacing = if (isHeader) 0.05.sp else 0.sp
         )
     }
 }
