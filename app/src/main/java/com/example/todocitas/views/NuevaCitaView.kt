@@ -26,11 +26,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.todocitas.ui.theme.BackgroundDark
 import com.example.todocitas.ui.theme.Primary
 import com.example.todocitas.ui.theme.ToDoCitasTheme
@@ -38,6 +40,8 @@ import com.example.todocitas.ui.theme.ToDoCitasTheme
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun NuevaCitaView(
+    navController: NavController,
+    openDrawer: () -> Unit
 ) {
     var searchQuery by remember { mutableStateOf("") }
 
@@ -56,7 +60,7 @@ fun NuevaCitaView(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = openDrawer) {
                         Icon(
                             Icons.Default.Menu,
                             contentDescription = "Menu",
@@ -95,6 +99,9 @@ fun NuevaCitaView(
 @Composable
 fun NuevaCitaViewPreview() {
     ToDoCitasTheme {
-        NuevaCitaView()
+        NuevaCitaView(
+            NavController(LocalContext.current),
+            openDrawer = {}
+        )
     }
 }

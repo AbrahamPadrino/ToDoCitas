@@ -125,19 +125,34 @@ fun NavManager() {
                 )
             }
             composable(Views.ListaCitasView.route) {
-                ListaCitasView()
+                ListaCitasView(
+                    navController = navController,
+                    openDrawer = { scope.launch { drawerState.open() } }
+                )
             }
             composable(Views.NuevaCitaView.route) {
-                NuevaCitaView()
+                NuevaCitaView(
+                    navController = navController,
+                    openDrawer = { scope.launch { drawerState.open() } }
+                )
             }
             composable(Views.ReporteTicketView.route) {
-                ReporteTicketView()
+                ReporteTicketView(
+                    navController = navController,
+                    openDrawer = { scope.launch { drawerState.open() } }
+                )
             }
             composable(Views.ReporteSemanalView.route) {
-                ReporteSemanalView()
+                ReporteSemanalView(
+                    navController = navController,
+                    openDrawer = { scope.launch { drawerState.open() } }
+                )
             }
             composable(Views.ReporteMensualView.route) {
-                ReporteMensualView()
+                ReporteMensualView(
+                    navController = navController,
+                    openDrawer = { scope.launch { drawerState.open() } }
+                )
             }
         }
     }

@@ -11,17 +11,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.todocitas.ui.theme.*
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListaCitasView(
+    navController: NavController,
+    openDrawer: () -> Unit
 ) {
     var searchQuery by remember { mutableStateOf("") }
 
@@ -40,7 +44,7 @@ fun ListaCitasView(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = openDrawer) {
                         Icon(
                             Icons.Default.Menu,
                             contentDescription = "Menu",
@@ -79,6 +83,9 @@ fun ListaCitasView(
 @Composable
 fun ListaCitasViewPreview() {
     ToDoCitasTheme {
-        ListaCitasView()
+        ListaCitasView(
+            NavController(LocalContext.current),
+            openDrawer = {}
+        )
     }
 }
