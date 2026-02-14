@@ -1,5 +1,8 @@
 package com.example.todocitas.views
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -21,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,8 +32,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
 import com.example.todocitas.components.CustomTextField
-import com.example.todocitas.data.local.entities.Cliente
 import com.example.todocitas.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -38,12 +42,24 @@ fun NuevoClienteView(
     onBack: () -> Unit,
     navController: NavController,
     openDrawer: () -> Unit,
-    onSaveCliente: (Cliente) -> Unit = {}
+    onSaveCliente: (nombre: String, apellido: String, correo: String, telefono: String, imagenUri: String?) -> Unit
 ) {
     var nombre by remember { mutableStateOf("") }
     var apellido by remember { mutableStateOf("") }
     var correo by remember { mutableStateOf("") }
     var telefono by remember { mutableStateOf("") }
+    var imagenUri by remember { mutableStateOf<Uri?>(null) }
+    var mostrarDialogo by remember { mutableStateOf(false) }
+
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        // Este bloque se ejecuta cuando el usuario selecciona una imagen (o cancela).
+        // Si `uri` no es nulo, lo guardamos en nuestro estado.
+        uri?.let {
+            imagenUri = it
+        }
+    }
 
     Scaffold(
         containerColor = BackgroundDark,
@@ -86,26 +102,38 @@ fun NuevoClienteView(
             Box(
                 modifier = Modifier
                     .size(120.dp)
-                    .clickable { /* Acción para seleccionar foto */ },
+                    .clickable { imagePickerLauncher.launch("image/*") },
                 contentAlignment = Alignment.Center
             ) {
-                // Placeholder de la imagen
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .clip(CircleShape)
-                        .background(Color(0xFFE0CFC2)) // Color beige claro del placeholder
-                        .border(4.dp, CardDark, CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        Icons.Default.AccountCircle,
-                        contentDescription = null,
-                        tint = Color.White.copy(alpha = 0.5f),
-                        modifier = Modifier.size(48.dp)
+                if (imagenUri != null) {
+                    // Usamos Coil para cargar la imagen desde la Uri.
+                    AsyncImage(
+                        model = imagenUri,
+                        contentDescription = "Foto de perfil seleccionada",
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(CircleShape)
+                            .border(4.dp, CardDark, CircleShape),
+                        contentScale = ContentScale.Crop // Asegura que la imagen llene el círculo
                     )
+                } else {
+                    // Placeholder de la imagen
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(CircleShape)
+                            .background(Color(0xFFE0CFC2)) // Color beige claro del placeholder
+                            .border(4.dp, CardDark, CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            Icons.Default.AccountCircle,
+                            contentDescription = null,
+                            tint = Color.White.copy(alpha = 0.5f),
+                            modifier = Modifier.size(48.dp)
+                        )
+                    }
                 }
-
                 // Botón de editar
                 Box(
                     modifier = Modifier
@@ -179,7 +207,16 @@ fun NuevoClienteView(
 
             // Botones de acción
             Button(
-                onClick = { /* Acción para guardar cliente */ },
+                onClick = {
+                    onSaveCliente(
+                        nombre,
+                        apellido,
+                        correo,
+                        telefono,
+                        imagenUri?.toString())
+
+                    mostrarDialogo = true
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
@@ -209,9 +246,43 @@ fun NuevoClienteView(
             Spacer(modifier = Modifier.height(24.dp))
         }
     }
+
+    if (mostrarDialogo) {
+        AlertDialog(
+            onDismissRequest = {
+                // Se llama cuando el usuario presiona fuera del diálogo.
+                // También cerramos la pantalla en este caso.
+                onBack()
+            },
+            title = {
+                Text(
+                    text = "¡Finalizado!",
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+            },
+            text = {
+                Text(
+                    text = "El nuevo cliente ha sido registrado exitosamente.",
+                    color = TextSecondary
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        mostrarDialogo = false // Opcional, ya que onBack() lo hará.
+                        onBack()
+                    }
+                ) {
+                    Text("Confirmar", color = Primary, fontWeight = FontWeight.Bold)
+                }
+            },
+            containerColor = CardDark,
+            titleContentColor = Color.White,
+            textContentColor = TextSecondary
+        )
+    }
 }
-
-
 
 // --- Preview para Android Studio ---
 @Preview(showBackground = true, backgroundColor = 0xFF101C22)
@@ -222,7 +293,7 @@ fun NuevoClienteViewPreview() {
             navController = rememberNavController(),
             openDrawer = {},
             onBack = {},
-            onSaveCliente = {}
+            onSaveCliente = { _, _, _, _, _ -> }
         )
     }
 }

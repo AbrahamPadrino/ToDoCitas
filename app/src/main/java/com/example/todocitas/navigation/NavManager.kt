@@ -13,6 +13,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.todocitas.data.local.entities.Cliente
 import com.example.todocitas.ui.theme.BackgroundDark
 import com.example.todocitas.viewmodels.ClientesViewModel
 import com.example.todocitas.viewmodels.ServiciosViewModel
@@ -100,9 +101,17 @@ fun NavManager() {
                     onBack = { navController.popBackStack() },
                     navController = navController,
                     openDrawer = { scope.launch { drawerState.open() } },
-
-                    //onSaveCliente = { clieneteViewModel.guardarCliente(it) }
-
+                    onSaveCliente = { nombre, apellido, correo, telefono, imagenUri ->
+                        val nuevoCliente = Cliente(
+                            nombre = nombre,
+                            apellido = apellido,
+                            correo = correo,
+                            telefono = telefono,
+                            imagenUri = imagenUri
+                        )
+                        clieneteViewModel.agregarCliente(nuevoCliente)
+                        //navController.popBackStack()
+                    }
                 )
             }
 

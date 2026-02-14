@@ -233,9 +233,9 @@ fun EmptyState(isEndOfList: Boolean = false) {
 fun ListaClientesViewPreview() {
     // Datos de ejemplo para la preview
     val sampleClients = listOf(
-        Cliente(1, "Ana García Pérez", "+34 600 123 456", "R.drawable.profile1"), // Reemplaza con tus imágenes o la URI de tu recurso
-        Cliente(2, "Carlos Martinez", "+34 601 234 567", "R.drawable.profile2"),
-        Cliente(3, "Laura Fernandez", "+34 602 345 678", "R.drawable.profile10")
+        Cliente(1, "Ana", "García Pérez","ana_email@gmail.com", "+34 600 123 456", "R.drawable.profile1"), // Reemplaza con tus imágenes o la URI de tu recurso
+        Cliente(2, "Carlos", "Martinez", "Carlos2026@gmail.com", "+34 601 234 567", "R.drawable.profile2"),
+        Cliente(3, "Laura", "Fernandez","laura_email@gmail.com", "+34 602 345 678", "R.drawable.profile10")
     )
     ToDoCitasTheme {
         ListaClientesView(

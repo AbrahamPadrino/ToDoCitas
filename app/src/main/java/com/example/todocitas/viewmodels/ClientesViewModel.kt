@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ClientesViewModel @Inject constructor(
+class   ClientesViewModel @Inject constructor(
     private val repository: ClientesRepository
 ) : ViewModel() {
     var clientesState by mutableStateOf(ClientesState())
