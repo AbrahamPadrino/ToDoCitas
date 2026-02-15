@@ -28,7 +28,8 @@ import com.example.todocitas.R
 import com.example.todocitas.components.SearchBar
 import com.example.todocitas.data.local.entities.Cliente
 import com.example.todocitas.ui.theme.*
-
+import androidx.core.net.toUri // Import para convertir String a Uri
+import coil.compose.AsyncImage
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListaClientesView(
@@ -36,7 +37,8 @@ fun ListaClientesView(
     onAddNewClient: () -> Unit,
     clientes: List<Cliente>,
     navController: NavController,
-    openDrawer: () -> Unit
+    openDrawer: () -> Unit,
+    onDeleteCliente: (Cliente) -> Unit
 ) {
     var searchQuery by remember { mutableStateOf("") }
 
@@ -127,8 +129,8 @@ fun ClientCard(cliente: Cliente) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.profile1),
+            AsyncImage(
+                model = cliente.imagenUri?.toUri() ?: R.drawable.outline_account_box_24,
                 contentDescription = "Foto de ${cliente.nombre}",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -243,7 +245,8 @@ fun ListaClientesViewPreview() {
             onAddNewClient = {},
             clientes = sampleClients,
             navController = NavController(LocalContext.current),
-            openDrawer = {}
+            openDrawer = {},
+            onDeleteCliente = {}
         )
     }
 }
@@ -257,7 +260,8 @@ fun ListaClientesEmptyPreview() {
             onAddNewClient = {},
             clientes = emptyList(),
             navController = NavController(LocalContext.current),
-            openDrawer = {}
+            openDrawer = {},
+            onDeleteCliente = {}
         )
     }
 }

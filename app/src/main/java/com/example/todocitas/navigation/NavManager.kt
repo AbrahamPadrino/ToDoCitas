@@ -6,6 +6,7 @@ import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -69,7 +70,9 @@ fun NavManager() {
     ) {
 
         val serviciosViewModel: ServiciosViewModel = hiltViewModel()
-        val clieneteViewModel: ClientesViewModel = hiltViewModel()
+        val clienteViewModel: ClientesViewModel = hiltViewModel()
+
+        val listaDeClientes by clienteViewModel.clientesState.collectAsState()
 
         NavHost(
             navController = navController,
@@ -91,9 +94,10 @@ fun NavManager() {
                 ListaClientesView(
                     onBack = { navController.popBackStack() },
                     onAddNewClient = { navController.navigate(Views.NuevoClienteView.route) },
-                    clientes = clieneteViewModel.clientesState.listaClientes,
+                    clientes = listaDeClientes,
                     navController = navController,
-                    openDrawer = { scope.launch { drawerState.open() } }
+                    openDrawer = { scope.launch { drawerState.open() } },
+                    onDeleteCliente = { cliente -> clienteViewModel.eliminarCliente(cliente) }
                 )
             }
             composable(Views.NuevoClienteView.route) {
@@ -109,7 +113,7 @@ fun NavManager() {
                             telefono = telefono,
                             imagenUri = imagenUri
                         )
-                        clieneteViewModel.agregarCliente(nuevoCliente)
+                        clienteViewModel.agregarCliente(nuevoCliente)
                         //navController.popBackStack()
                     }
                 )
