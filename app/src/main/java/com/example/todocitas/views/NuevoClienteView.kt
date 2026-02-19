@@ -3,6 +3,8 @@ package com.example.todocitas.views
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import java.io.File // Import para manejar archivos
+import java.io.FileOutputStream // Import para escribir archivos
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -25,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -51,13 +54,39 @@ fun NuevoClienteView(
     var imagenUri by remember { mutableStateOf<Uri?>(null) }
     var mostrarDialogo by remember { mutableStateOf(false) }
 
+    val context = LocalContext.current
+
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
+    ) { tempUri: Uri? ->
         // Este bloque se ejecuta cuando el usuario selecciona una imagen (o cancela).
+        // 'tempUri' es la URI temporal con permiso de corta duración.
         // Si `uri` no es nulo, lo guardamos en nuestro estado.
-        uri?.let {
-            imagenUri = it
+        tempUri?.let {
+            // --- 2. LÓGICA PARA COPIAR LA IMAGEN Y OBTENER UNA URI PERSISTENTE ---
+            val fileName = "profile_${System.currentTimeMillis()}.jpg"
+            val file = File(context.filesDir, fileName)
+
+            try {
+                // Usamos un InputStream para leer los datos de la URI temporal
+                val inputStream = context.contentResolver.openInputStream(it)
+                // Usamos un FileOutputStream para escribir los datos en nuestro nuevo archivo
+                val outputStream = FileOutputStream(file)
+                // Copiamos los bytes
+                inputStream?.copyTo(outputStream)
+
+                inputStream?.close()
+                outputStream.close()
+
+                // 3. ¡LA PARTE CLAVE! Actualizamos nuestro estado con la URI de NUESTRO archivo.
+                // Esta URI es persistente y siempre será accesible para nuestra app.
+                imagenUri = Uri.fromFile(file)
+
+            } catch (e: Exception) {
+                // Manejar la excepción (ej: mostrar un Toast de error)
+                e.printStackTrace()
+            }
+            //imagenUri = it
         }
     }
 
