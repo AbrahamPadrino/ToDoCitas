@@ -1,7 +1,10 @@
 package com.example.todocitas.views
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -11,9 +14,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -23,6 +29,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.rotationMatrix
 import androidx.navigation.NavController
 import com.example.todocitas.R
 import com.example.todocitas.components.SearchBar
@@ -41,6 +48,7 @@ fun ListaClientesView(
     onDeleteCliente: (Cliente) -> Unit
 ) {
     var searchQuery by remember { mutableStateOf("") }
+    var expandedCardId by remember { mutableStateOf<Int?>(null) }
 
     Scaffold(
         containerColor = BackgroundDark,
@@ -99,7 +107,24 @@ fun ListaClientesView(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(clientes.filter { it.nombre.contains(searchQuery, ignoreCase = true) }) { cliente ->
-                        ClientCard(cliente = cliente)
+                        ClientCard(
+                            cliente = cliente,
+                            isExpanded = expandedCardId == cliente.id,
+                            onExpand = {
+                                // Si hacemos clic en una tarjeta ya expandida, la cerramos (null).
+                                // Si no, la expandimos.
+                                expandedCardId = if (expandedCardId == cliente.id) null else cliente.id
+                            },
+                            onDelete = {
+                                onDeleteCliente(cliente)
+                                expandedCardId = null
+                            },
+                            // Pasa aquí las otras acciones (onEdit, onCall, etc.)
+                            onEdit = { /* Lógica de edición */ },
+                            onCall = { /* Lógica de llamada */ },
+                            onEmail = { /* Lógica de correo electrónico */ }
+
+                        )
                     }
 
                     // Mensaje "No hay más clientes" al final de la lista
@@ -115,12 +140,23 @@ fun ListaClientesView(
 
 
 @Composable
-fun ClientCard(cliente: Cliente) {
+fun ClientCard(
+    cliente: Cliente,
+    isExpanded: Boolean,
+    onExpand: () -> Unit,
+    onDelete: () -> Unit,
+    onEdit: () -> Unit,
+    onCall: () -> Unit,
+    onEmail: () -> Unit
+) {
+    // Animación de rotación para el icono de la flecha
+    val rotationAngle by animateFloatAsState(targetValue = if (isExpanded) 180f else 0f, label = "rotation")
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
             .background(CardDark)
+            .clickable(onClick = onExpand) // El clic en toda la tarjeta la expande/contrae
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -130,7 +166,7 @@ fun ClientCard(cliente: Cliente) {
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             AsyncImage(
-                model = cliente.imagenUri?.toUri() ?: R.drawable.outline_account_box_24,
+                model = cliente.imagenUri?.toUri() ?: R.drawable.outline_account_circle_24,
                 contentDescription = "Foto de ${cliente.nombre}",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -150,21 +186,36 @@ fun ClientCard(cliente: Cliente) {
                     fontSize = 14.sp
                 )
             }
+            Icon(
+                imageVector = Icons.Default.KeyboardArrowDown,
+                contentDescription = "Expandir/Contraer",
+                tint = TextSecondary,
+                modifier = Modifier.rotate(rotationAngle) // Aplica la rotación animada
+            )
         }
 
         // Botones de acción
-        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            ActionButton(icon = Icons.Default.Call, isPrimary = true, modifier = Modifier.weight(1f))
-            ActionButton(icon = Icons.Default.Email, modifier = Modifier.weight(1f))
-            ActionButton(icon = Icons.Default.Edit, modifier = Modifier.weight(1f))
-            ActionButton(icon = Icons.Default.Delete, isDelete = true, modifier = Modifier.weight(1f))
+        // AnimatedVisibility mostrará su contenido solo cuando `visible` sea true.
+        AnimatedVisibility(visible = isExpanded) {
+            Row(
+                modifier = Modifier.padding(top = 8.dp), // Espacio extra cuando aparece
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                // Modificamos ActionButton para que acepte un onClick
+                ActionButton(icon = Icons.Default.Call, isPrimary = true, modifier = Modifier.weight(1f), onClick = { /* Lógica de llamada */ })
+                ActionButton(icon = Icons.Default.Email, modifier = Modifier.weight(1f), onClick = { /* Lógica de email */ })
+                ActionButton(icon = Icons.Default.Edit, modifier = Modifier.weight(1f), onClick = onEdit)
+                ActionButton(icon = Icons.Default.Delete, isDelete = true, modifier = Modifier.weight(1f), onClick = onDelete)
+            }
         }
+
     }
 }
 
 @Composable
 fun ActionButton(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
     isPrimary: Boolean = false,
     isDelete: Boolean = false
