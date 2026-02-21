@@ -2,7 +2,6 @@ package com.example.todocitas.views
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -23,13 +22,11 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.graphics.rotationMatrix
 import androidx.navigation.NavController
 import com.example.todocitas.R
 import com.example.todocitas.components.SearchBar
@@ -37,6 +34,9 @@ import com.example.todocitas.data.local.entities.Cliente
 import com.example.todocitas.ui.theme.*
 import androidx.core.net.toUri // Import para convertir String a Uri
 import coil.compose.AsyncImage
+import android.content.Intent // Import para el Intent
+import android.net.Uri // Import para la URI del teléfono
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListaClientesView(
@@ -49,6 +49,8 @@ fun ListaClientesView(
 ) {
     var searchQuery by remember { mutableStateOf("") }
     var expandedCardId by remember { mutableStateOf<Int?>(null) }
+    var clienteAEliminar by remember { mutableStateOf<Cliente?>(null) }
+    val context = LocalContext.current
 
     Scaffold(
         containerColor = BackgroundDark,
@@ -98,7 +100,7 @@ fun ListaClientesView(
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp)
             )
-
+            // Lista de Clientes
             if (clientes.isEmpty()) {
                 EmptyState()
             } else {
@@ -116,17 +118,26 @@ fun ListaClientesView(
                                 expandedCardId = if (expandedCardId == cliente.id) null else cliente.id
                             },
                             onDelete = {
-                                onDeleteCliente(cliente)
-                                expandedCardId = null
+                                clienteAEliminar = cliente
                             },
-                            // Pasa aquí las otras acciones (onEdit, onCall, etc.)
-                            onEdit = { /* Lógica de edición */ },
-                            onCall = { /* Lógica de llamada */ },
-                            onEmail = { /* Lógica de correo electrónico */ }
 
+                            onEdit = { /* Lógica de edición */ },
+                            onCall = {
+                                val intent = Intent(Intent.ACTION_DIAL).apply {
+                                    data = Uri.parse("tel:${cliente.telefono}")
+                                }
+                                // Lanzamos el Intent usando el contexto.
+                                context.startActivity(intent)
+                            },
+                            onSms = {
+                                val intent = Intent(Intent.ACTION_SENDTO).apply {
+                                    data = Uri.parse("smsto:${cliente.telefono}")
+                                    putExtra("sms_body", "Hola ${cliente.nombre}, te contacto desde ToDoCitas, para confirmar tu cita programada")
+                                }
+                                context.startActivity(intent)
+                            }
                         )
                     }
-
                     // Mensaje "No hay más clientes" al final de la lista
                     item {
                         EmptyState(isEndOfList = true)
@@ -135,8 +146,53 @@ fun ListaClientesView(
             }
         }
     }
+    // Dialogo para Confirmar Eliminar
+    clienteAEliminar?.let { cliente ->
+        AlertDialog(
+            onDismissRequest = {
+                // Si presiona fuera, cierra el diálogo.
+                clienteAEliminar = null
+            },
+            containerColor = CardDark,
+            title = {
+                Text(
+                    text = "Confirmar Eliminación",
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+            },
+            text = {
+                Text(
+                    text = "¿Seguro deseas eliminar a ${cliente.nombre} ${cliente.apellido}? Esta acción no se puede deshacer.",
+                    color = TextSecondary
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onDeleteCliente(cliente)
+                        clienteAEliminar = null
+                        // Cierra la Card expandida si estaba abierta.
+                        expandedCardId = null
+                    }
+                ) {
+                    Text("ACEPTAR", color = TextAlert, fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        // Simplemente cierra el diálogo.
+                        clienteAEliminar = null
+                        expandedCardId = null
+                    }
+                ) {
+                    Text("CANCELAR", color = Primary, fontWeight = FontWeight.Normal)
+                }
+            }
+        )
+    }
 }
-
 
 
 @Composable
@@ -147,7 +203,7 @@ fun ClientCard(
     onDelete: () -> Unit,
     onEdit: () -> Unit,
     onCall: () -> Unit,
-    onEmail: () -> Unit
+    onSms: () -> Unit
 ) {
     // Animación de rotación para el icono de la flecha
     val rotationAngle by animateFloatAsState(targetValue = if (isExpanded) 180f else 0f, label = "rotation")
@@ -202,15 +258,15 @@ fun ClientCard(
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 // Modificamos ActionButton para que acepte un onClick
-                ActionButton(icon = Icons.Default.Call, isPrimary = true, modifier = Modifier.weight(1f), onClick = { /* Lógica de llamada */ })
-                ActionButton(icon = Icons.Default.Email, modifier = Modifier.weight(1f), onClick = { /* Lógica de email */ })
+                ActionButton(icon = Icons.Default.Call, isPrimary = true, modifier = Modifier.weight(1f), onClick =  onCall )
+                ActionButton(icon = Icons.Default.Email, modifier = Modifier.weight(1f), onClick = onSms)
                 ActionButton(icon = Icons.Default.Edit, modifier = Modifier.weight(1f), onClick = onEdit)
                 ActionButton(icon = Icons.Default.Delete, isDelete = true, modifier = Modifier.weight(1f), onClick = onDelete)
             }
         }
-
     }
 }
+
 
 @Composable
 fun ActionButton(
@@ -230,7 +286,7 @@ fun ActionButton(
     }
 
     IconButton(
-        onClick = { /* TODO: Implement action */ },
+        onClick = onClick,
         modifier = modifier
             .height(40.dp)
             .clip(RoundedCornerShape(10.dp))
@@ -278,7 +334,6 @@ fun EmptyState(isEndOfList: Boolean = false) {
         )
     }
 }
-
 
 // --- Preview para Android Studio ---
 @Preview(showBackground = true, backgroundColor = 0xFF101C22)
