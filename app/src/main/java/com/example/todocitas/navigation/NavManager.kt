@@ -10,11 +10,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.todocitas.data.local.entities.Cliente
+import androidx.navigation.navArgument
 import com.example.todocitas.ui.theme.BackgroundDark
 import com.example.todocitas.viewmodels.ClientesViewModel
 import com.example.todocitas.viewmodels.ServiciosViewModel
@@ -70,9 +71,15 @@ fun NavManager() {
     ) {
 
         val serviciosViewModel: ServiciosViewModel = hiltViewModel()
-        val clienteViewModel: ClientesViewModel = hiltViewModel()
+        val clientesViewModel: ClientesViewModel = hiltViewModel()
 
-        val listaDeClientes by clienteViewModel.clientesState.collectAsState()
+        // Recoge la lista de clientes paginada
+        val listaDeClientesPaginada by clientesViewModel.clientesPaginados.collectAsState()
+        // Recoge la información de paginación
+        val paginaActual by clientesViewModel.paginaActual.collectAsState()
+        val totalPaginas by clientesViewModel.totalPaginas.collectAsState()
+        val searchQuery by clientesViewModel.searchQuery.collectAsState()
+
 
         NavHost(
             navController = navController,
@@ -94,27 +101,42 @@ fun NavManager() {
                 ListaClientesView(
                     onBack = { navController.popBackStack() },
                     onAddNewClient = { navController.navigate(Views.NuevoClienteView.route) },
-                    clientes = listaDeClientes,
+                    clientes = listaDeClientesPaginada,
+                    paginaActual = paginaActual,
+                    totalPaginas = totalPaginas,
+                    onCambiarPagina = { nuevaPagina ->
+                        clientesViewModel.cambiarPagina(nuevaPagina)
+                    },
+                    searchQuery = searchQuery,
+                    onSearchQueryChange = { newQuery -> clientesViewModel.onSearchQueryChange(newQuery) },
                     navController = navController,
                     openDrawer = { scope.launch { drawerState.open() } },
-                    onDeleteCliente = { cliente -> clienteViewModel.eliminarCliente(cliente) }
+                    onEditCliente = { cliente ->
+                        // --- 2. NAVEGAMOS A LA RUTA DE EDICIÓN PASANDO EL ID ---
+                        navController.navigate(Views.NuevoClienteView.route + "?clienteId=${cliente.id}")
+                    },
+                    onDeleteCliente = { cliente -> clientesViewModel.eliminarCliente(cliente) }
                 )
             }
-            composable(Views.NuevoClienteView.route) {
+            // Se añade un argumento opcional `clienteId`. Si no se pasa, es una creación. Si se pasa, es una edición.
+            composable(
+                route = Views.NuevoClienteView.route + "?clienteId={clienteId}",
+                arguments = listOf(navArgument("clienteId") {
+                    type = NavType.IntType
+                    defaultValue = -1 // Un valor por defecto que indique que no se está editando
+                })
+            ) { backStackEntry ->
+                // Obtiene el ID de los argumentos de la ruta
+                val clienteId = backStackEntry.arguments?.getInt("clienteId") ?: -1
+
                 NuevoClienteView(
                     onBack = { navController.popBackStack() },
                     navController = navController,
                     openDrawer = { scope.launch { drawerState.open() } },
-                    onSaveCliente = { nombre, apellido, correo, telefono, imagenUri ->
-                        val nuevoCliente = Cliente(
-                            nombre = nombre,
-                            apellido = apellido,
-                            correo = correo,
-                            telefono = telefono,
-                            imagenUri = imagenUri
-                        )
-                        clienteViewModel.agregarCliente(nuevoCliente)
-                        //navController.popBackStack()
+                    clienteId = clienteId, // Pasa el ID a la vista
+                    clientesViewModel = clientesViewModel, // Pasa el ViewModel completo
+                    onSaveComplete = {
+                        navController.popBackStack()
                     }
                 )
             }

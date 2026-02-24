@@ -16,4 +16,19 @@ class ClientesRepository @Inject constructor(private val clientesDao: ClientesDa
     suspend fun updateCliente(cliente: Cliente) = clientesDao.updateCliente(cliente)
 
     suspend fun deleteCliente(cliente: Cliente) = clientesDao.deleteCliente(cliente)
+
+    fun getClientesPaginados(limit: Int, offset: Int): Flow<List<Cliente>> {
+        return clientesDao.getClientesPaginados(limit, offset)
+    }
+
+    fun countClientes(): Flow<Int> = clientesDao.countClientes()
+
+    fun searchAndPaginateClientes(query: String, limit: Int, offset: Int): Flow<List<Cliente>> {
+        return clientesDao.searchAndPaginateClientes(query, limit, offset)
+    }
+
+    fun countSearchResults(query: String): Flow<Int> {
+        return clientesDao.countSearchResults(query)
+    }
+
 }

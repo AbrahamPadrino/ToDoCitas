@@ -33,11 +33,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.todocitas.components.CustomTextField
 import com.example.todocitas.ui.theme.*
+import com.example.todocitas.viewmodels.ClientesViewModel
+import androidx.core.net.toUri
+import androidx.navigation.NavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,7 +46,9 @@ fun NuevoClienteView(
     onBack: () -> Unit,
     navController: NavController,
     openDrawer: () -> Unit,
-    onSaveCliente: (nombre: String, apellido: String, correo: String, telefono: String, imagenUri: String?) -> Unit
+    clienteId: Int,
+    clientesViewModel: ClientesViewModel,
+    onSaveComplete: () -> Unit
 ) {
     var nombre by remember { mutableStateOf("") }
     var apellido by remember { mutableStateOf("") }
@@ -55,6 +58,21 @@ fun NuevoClienteView(
     var mostrarDialogo by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
+
+    LaunchedEffect(key1 = clienteId) {
+        if (clienteId != -1) {
+            // Si estamos en modo edición, pedimos al ViewModel que cargue los datos del cliente.
+            val cliente = clientesViewModel.getClienteById(clienteId)
+            cliente?.let {
+                // Rellenamos los estados del formulario con los datos cargados.
+                nombre = it.nombre
+                apellido = it.apellido
+                correo = it.correo
+                telefono = it.telefono
+                imagenUri = it.imagenUri?.toUri()
+            }
+        }
+    }
 
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -125,7 +143,7 @@ fun NuevoClienteView(
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Sección Añadir Foto
             Box(
@@ -196,7 +214,7 @@ fun NuevoClienteView(
                 fontSize = 14.sp
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Campos de texto del formulario
             Column(
@@ -232,17 +250,35 @@ fun NuevoClienteView(
                 )
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Botones de acción
             Button(
                 onClick = {
-                    onSaveCliente(
-                        nombre,
-                        apellido,
-                        correo,
-                        telefono,
-                        imagenUri?.toString())
+                    if (clienteId == -1) {
+                        // Modo Creación
+                        clientesViewModel.agregarCliente(
+                            com.example.todocitas.data.local.entities.Cliente(
+                                nombre = nombre,
+                                apellido = apellido,
+                                correo = correo,
+                                telefono = telefono,
+                                imagenUri = imagenUri?.toString()
+                            )
+                        )
+                    } else {
+                        // Modo Edición
+                        clientesViewModel.updateCliente(
+                            com.example.todocitas.data.local.entities.Cliente(
+                                id = clienteId, // ¡Mantenemos el ID original!
+                                nombre = nombre,
+                                apellido = apellido,
+                                correo = correo,
+                                telefono = telefono,
+                                imagenUri = imagenUri?.toString()
+                            )
+                        )
+                    }
 
                     mostrarDialogo = true
                 },
@@ -257,11 +293,15 @@ fun NuevoClienteView(
                     contentDescription = null,
                     modifier = Modifier.size(20.dp)
                 )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Guardar Cliente", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(
+                    if (clienteId == -1) "Guardar Cliente" else "Actualizar Cliente",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp
+                )
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             TextButton(onClick = onBack) {
                 Text(
@@ -272,7 +312,7 @@ fun NuevoClienteView(
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 
@@ -292,15 +332,15 @@ fun NuevoClienteView(
             },
             text = {
                 Text(
-                    text = "El nuevo cliente ha sido registrado exitosamente.",
+                    if (clienteId == -1) "Cliente guardado con éxito" else "Cliente actualizado con éxito",
                     color = TextSecondary
                 )
             },
             confirmButton = {
                 TextButton(
                     onClick = {
-                        mostrarDialogo = false // Opcional, ya que onBack() lo hará.
-                        onBack()
+                        mostrarDialogo = false
+                        onSaveComplete() // Usamos el callback para navegar hacia atrás
                     }
                 ) {
                     Text("Confirmar", color = Primary, fontWeight = FontWeight.Bold)
@@ -319,10 +359,12 @@ fun NuevoClienteView(
 fun NuevoClienteViewPreview() {
     ToDoCitasTheme {
         NuevoClienteView(
-            navController = rememberNavController(),
             openDrawer = {},
+            navController = NavController(LocalContext.current),
             onBack = {},
-            onSaveCliente = { _, _, _, _, _ -> }
+            clienteId = TODO(),
+            clientesViewModel = TODO(),
+            onSaveComplete = {}
         )
     }
 }

@@ -43,11 +43,16 @@ fun ListaClientesView(
     onBack: () -> Unit,
     onAddNewClient: () -> Unit,
     clientes: List<Cliente>,
+    paginaActual: Int,
+    totalPaginas: Int,
+    onCambiarPagina: (Int) -> Unit,
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
     navController: NavController,
     openDrawer: () -> Unit,
-    onDeleteCliente: (Cliente) -> Unit
+    onDeleteCliente: (Cliente) -> Unit,
+    onEditCliente: (Cliente) -> Unit
 ) {
-    var searchQuery by remember { mutableStateOf("") }
     var expandedCardId by remember { mutableStateOf<Int?>(null) }
     var clienteAEliminar by remember { mutableStateOf<Cliente?>(null) }
     val context = LocalContext.current
@@ -76,11 +81,13 @@ fun ListaClientesView(
                     }
                 },
                 actions = {
-                    IconButton(onClick = onAddNewClient) {
+                    IconButton(modifier = Modifier.size(48.dp),onClick = onAddNewClient) {
                         Icon(
                             Icons.Default.AddCircle,
                             contentDescription = "Añadir Cliente",
-                            tint = Primary
+                            tint = Primary,
+                            modifier = Modifier.size(32.dp)
+
                         )
                     }
                 },
@@ -90,59 +97,76 @@ fun ListaClientesView(
             )
         }
     ) { paddingValues ->
-        Column(modifier = Modifier.padding(paddingValues)) {
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues)
+        ) {
             // Barra de búsqueda
             SearchBar(
                 value = searchQuery,
-                onValueChange = { searchQuery = it },
+                onValueChange = onSearchQueryChange,
                 placeholder = "Buscar cliente...",
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp)
             )
             // Lista de Clientes
-            if (clientes.isEmpty()) {
-                EmptyState()
-            } else {
-                LazyColumn(
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(clientes.filter { it.nombre.contains(searchQuery, ignoreCase = true) }) { cliente ->
-                        ClientCard(
-                            cliente = cliente,
-                            isExpanded = expandedCardId == cliente.id,
-                            onExpand = {
-                                // Si hacemos clic en una tarjeta ya expandida, la cerramos (null).
-                                // Si no, la expandimos.
-                                expandedCardId = if (expandedCardId == cliente.id) null else cliente.id
-                            },
-                            onDelete = {
-                                clienteAEliminar = cliente
-                            },
+            Box(modifier = Modifier.weight(1f)) {
+                if (clientes.isEmpty() && searchQuery.isBlank()) {
+                    EmptyState()
+                } else {
+                    LazyColumn(
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(clientes) { cliente ->
+                            ClientCard(
+                                cliente = cliente,
+                                isExpanded = expandedCardId == cliente.id,
+                                onExpand = {
+                                    // Si hacemos clic en una tarjeta ya expandida, la cerramos (null).
+                                    // Si no, la expandimos.
+                                    expandedCardId =
+                                        if (expandedCardId == cliente.id) null else cliente.id
+                                },
+                                onDelete = {
+                                    clienteAEliminar = cliente
+                                },
 
-                            onEdit = { /* Lógica de edición */ },
-                            onCall = {
-                                val intent = Intent(Intent.ACTION_DIAL).apply {
-                                    data = Uri.parse("tel:${cliente.telefono}")
+                                onEdit = { onEditCliente(cliente) },
+
+                                onCall = {
+                                    val intent = Intent(Intent.ACTION_DIAL).apply {
+                                        data = Uri.parse("tel:${cliente.telefono}")
+                                    }
+                                    // Lanzamos el Intent usando el contexto.
+                                    context.startActivity(intent)
+                                },
+                                onSms = {
+                                    val intent = Intent(Intent.ACTION_SENDTO).apply {
+                                        data = Uri.parse("smsto:${cliente.telefono}")
+                                        putExtra(
+                                            "sms_body",
+                                            "Hola ${cliente.nombre}, te contacto desde ToDoCitas, para confirmar tu cita programada"
+                                        )
+                                    }
+                                    context.startActivity(intent)
                                 }
-                                // Lanzamos el Intent usando el contexto.
-                                context.startActivity(intent)
-                            },
-                            onSms = {
-                                val intent = Intent(Intent.ACTION_SENDTO).apply {
-                                    data = Uri.parse("smsto:${cliente.telefono}")
-                                    putExtra("sms_body", "Hola ${cliente.nombre}, te contacto desde ToDoCitas, para confirmar tu cita programada")
-                                }
-                                context.startActivity(intent)
-                            }
-                        )
-                    }
-                    // Mensaje "No hay más clientes" al final de la lista
-                    item {
-                        EmptyState(isEndOfList = true)
+                            )
+                        }
+                        // Mensaje "No hay más clientes" al final de la lista
+                        item {
+                            //EmptyState(isEndOfList = true)
+                        }
                     }
                 }
+            }
+            if (totalPaginas > 1) {
+                PaginacionControles(
+                    paginaActual = paginaActual,
+                    totalPaginas = totalPaginas,
+                    onCambiarPagina = onCambiarPagina
+                )
             }
         }
     }
@@ -296,7 +320,7 @@ fun ActionButton(
     }
 }
 
-
+// Lista sin mas registos
 @Composable
 fun EmptyState(isEndOfList: Boolean = false) {
     Column(
@@ -335,6 +359,61 @@ fun EmptyState(isEndOfList: Boolean = false) {
     }
 }
 
+// Controles de Paginación
+@Composable
+fun PaginacionControles(
+    paginaActual: Int,    totalPaginas: Int,
+    onCambiarPagina: (Int) -> Unit,
+    modifier: Modifier = Modifier // Hacemos el modifier opcional
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp, horizontal = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        // Botón para ir a la página ANTERIOR
+        IconButton(
+            onClick = { onCambiarPagina(paginaActual - 1) },
+            // El botón se deshabilita si estamos en la primera página
+            enabled = paginaActual > 1
+        ) {
+            Icon(
+                imageVector = Icons.Default.KeyboardArrowLeft,
+                contentDescription = "Página anterior",
+                // El color cambia si el botón está deshabilitado para dar feedback visual
+                tint = if (paginaActual > 1) Primary else TextSecondary.copy(alpha = 0.5f)
+            )
+        }
+
+        Spacer(modifier = Modifier.width(24.dp))
+
+        // Texto que indica la página actual y el total
+        Text(
+            text = "Página $paginaActual de $totalPaginas",
+            fontWeight = FontWeight.Bold,
+            color = TextSecondary,
+            fontSize = 16.sp
+        )
+
+        Spacer(modifier = Modifier.width(24.dp))
+
+        // Botón para ir a la página SIGUIENTE
+        IconButton(
+            onClick = { onCambiarPagina(paginaActual + 1) },
+            // El botón se deshabilita si estamos en la última página
+            enabled = paginaActual < totalPaginas
+        ) {
+            Icon(
+                imageVector = Icons.Default.KeyboardArrowRight,
+                contentDescription = "Página siguiente",
+                tint = if (paginaActual < totalPaginas) Primary else TextSecondary.copy(alpha = 0.5f)
+            )
+        }
+    }
+}
+
 // --- Preview para Android Studio ---
 @Preview(showBackground = true, backgroundColor = 0xFF101C22)
 @Composable
@@ -350,9 +429,15 @@ fun ListaClientesViewPreview() {
             onBack = {},
             onAddNewClient = {},
             clientes = sampleClients,
+            paginaActual = 1,
+            totalPaginas = 1,
+            onCambiarPagina = {},
+            searchQuery = "",
+            onSearchQueryChange = {},
             navController = NavController(LocalContext.current),
             openDrawer = {},
-            onDeleteCliente = {}
+            onDeleteCliente = {},
+            onEditCliente = {}
         )
     }
 }
@@ -365,9 +450,15 @@ fun ListaClientesEmptyPreview() {
             onBack = {},
             onAddNewClient = {},
             clientes = emptyList(),
+            paginaActual = 1,
+            totalPaginas = 1,
+            onCambiarPagina = {},
+            searchQuery = "",
+            onSearchQueryChange = {},
             navController = NavController(LocalContext.current),
             openDrawer = {},
-            onDeleteCliente = {}
+            onDeleteCliente = {},
+            onEditCliente = {}
         )
     }
 }
