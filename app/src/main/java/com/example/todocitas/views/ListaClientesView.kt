@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -57,6 +58,11 @@ fun ListaClientesView(
     var clienteAEliminar by remember { mutableStateOf<Cliente?>(null) }
     val context = LocalContext.current
 
+    LaunchedEffect(paginaActual) {
+        // Al cambiar de página, cierra cualquier tarjeta que estuviera expandida.
+        expandedCardId = null
+    }
+
     Scaffold(
         containerColor = BackgroundDark,
         topBar = {
@@ -81,7 +87,7 @@ fun ListaClientesView(
                     }
                 },
                 actions = {
-                    IconButton(modifier = Modifier.size(48.dp),onClick = onAddNewClient) {
+                    IconButton(modifier = Modifier.size(48.dp), onClick = onAddNewClient) {
                         Icon(
                             Icons.Default.AddCircle,
                             contentDescription = "Añadir Cliente",
@@ -97,9 +103,10 @@ fun ListaClientesView(
             )
         }
     ) { paddingValues ->
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValues)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
         ) {
             // Barra de búsqueda
             SearchBar(
@@ -124,8 +131,8 @@ fun ListaClientesView(
                                 cliente = cliente,
                                 isExpanded = expandedCardId == cliente.id,
                                 onExpand = {
-                                    // Si hacemos clic en una tarjeta ya expandida, la cerramos (null).
-                                    // Si no, la expandimos.
+                                    /*  Si hace clic en una tarjeta ya expandida, la cierra (null).
+                                        Si no, la expandimos.*/
                                     expandedCardId =
                                         if (expandedCardId == cliente.id) null else cliente.id
                                 },
@@ -139,7 +146,6 @@ fun ListaClientesView(
                                     val intent = Intent(Intent.ACTION_DIAL).apply {
                                         data = Uri.parse("tel:${cliente.telefono}")
                                     }
-                                    // Lanzamos el Intent usando el contexto.
                                     context.startActivity(intent)
                                 },
                                 onSms = {
@@ -230,7 +236,10 @@ fun ClientCard(
     onSms: () -> Unit
 ) {
     // Animación de rotación para el icono de la flecha
-    val rotationAngle by animateFloatAsState(targetValue = if (isExpanded) 180f else 0f, label = "rotation")
+    val rotationAngle by animateFloatAsState(
+        targetValue = if (isExpanded) 180f else 0f,
+        label = "rotation"
+    )
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -254,12 +263,22 @@ fun ClientCard(
                     .clip(CircleShape)
             )
             Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = cliente.nombre,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color.White,
-                    fontSize = 16.sp
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = cliente.nombre,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color.White,
+                        fontSize = 14.sp
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = cliente.apellido,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color.White,
+                        fontSize = 14.sp
+                    )
+                }
+
                 Text(
                     text = cliente.telefono,
                     color = TextSecondary,
@@ -275,17 +294,35 @@ fun ClientCard(
         }
 
         // Botones de acción
-        // AnimatedVisibility mostrará su contenido solo cuando `visible` sea true.
+        // AnimatedVisibility mostrará su contenido solo cuando 'visible' sea true.
         AnimatedVisibility(visible = isExpanded) {
             Row(
-                modifier = Modifier.padding(top = 8.dp), // Espacio extra cuando aparece
+                modifier = Modifier.padding(top = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 // Modificamos ActionButton para que acepte un onClick
-                ActionButton(icon = Icons.Default.Call, isPrimary = true, modifier = Modifier.weight(1f), onClick =  onCall )
-                ActionButton(icon = Icons.Default.Email, modifier = Modifier.weight(1f), onClick = onSms)
-                ActionButton(icon = Icons.Default.Edit, modifier = Modifier.weight(1f), onClick = onEdit)
-                ActionButton(icon = Icons.Default.Delete, isDelete = true, modifier = Modifier.weight(1f), onClick = onDelete)
+                ActionButton(
+                    icon = Icons.Default.Call,
+                    isPrimary = true,
+                    modifier = Modifier.weight(1f),
+                    onClick = onCall
+                )
+                ActionButton(
+                    icon = Icons.Default.Email,
+                    modifier = Modifier.weight(1f),
+                    onClick = onSms
+                )
+                ActionButton(
+                    icon = Icons.Default.Edit,
+                    modifier = Modifier.weight(1f),
+                    onClick = onEdit
+                )
+                ActionButton(
+                    icon = Icons.Default.Delete,
+                    isDelete = true,
+                    modifier = Modifier.weight(1f),
+                    onClick = onDelete
+                )
             }
         }
     }
@@ -294,7 +331,7 @@ fun ClientCard(
 
 @Composable
 fun ActionButton(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     isPrimary: Boolean = false,
@@ -362,9 +399,9 @@ fun EmptyState(isEndOfList: Boolean = false) {
 // Controles de Paginación
 @Composable
 fun PaginacionControles(
-    paginaActual: Int,    totalPaginas: Int,
+    paginaActual: Int, totalPaginas: Int,
     onCambiarPagina: (Int) -> Unit,
-    modifier: Modifier = Modifier // Hacemos el modifier opcional
+    modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier
@@ -373,10 +410,10 @@ fun PaginacionControles(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
-        // Botón para ir a la página ANTERIOR
+        // Ir a la página ANTERIOR
         IconButton(
             onClick = { onCambiarPagina(paginaActual - 1) },
-            // El botón se deshabilita si estamos en la primera página
+            // El botón se deshabilita si está en la primera página
             enabled = paginaActual > 1
         ) {
             Icon(
@@ -388,7 +425,6 @@ fun PaginacionControles(
         }
 
         Spacer(modifier = Modifier.width(24.dp))
-
         // Texto que indica la página actual y el total
         Text(
             text = "Página $paginaActual de $totalPaginas",
@@ -396,13 +432,11 @@ fun PaginacionControles(
             color = TextSecondary,
             fontSize = 16.sp
         )
-
         Spacer(modifier = Modifier.width(24.dp))
-
         // Botón para ir a la página SIGUIENTE
         IconButton(
             onClick = { onCambiarPagina(paginaActual + 1) },
-            // El botón se deshabilita si estamos en la última página
+            // El botón se deshabilita si está en la última página
             enabled = paginaActual < totalPaginas
         ) {
             Icon(
@@ -420,9 +454,30 @@ fun PaginacionControles(
 fun ListaClientesViewPreview() {
     // Datos de ejemplo para la preview
     val sampleClients = listOf(
-        Cliente(1, "Ana", "García Pérez","ana_email@gmail.com", "+34 600 123 456", "R.drawable.profile1"), // Reemplaza con tus imágenes o la URI de tu recurso
-        Cliente(2, "Carlos", "Martinez", "Carlos2026@gmail.com", "+34 601 234 567", "R.drawable.profile2"),
-        Cliente(3, "Laura", "Fernandez","laura_email@gmail.com", "+34 602 345 678", "R.drawable.profile10")
+        Cliente(
+            1,
+            "Ana",
+            "García Pérez",
+            "ana_email@gmail.com",
+            "+34 600 123 456",
+            "R.drawable.profile1"
+        ), // Reemplaza con tus imágenes o la URI de tu recurso
+        Cliente(
+            2,
+            "Carlos",
+            "Martinez",
+            "Carlos2026@gmail.com",
+            "+34 601 234 567",
+            "R.drawable.profile2"
+        ),
+        Cliente(
+            3,
+            "Laura",
+            "Fernandez",
+            "laura_email@gmail.com",
+            "+34 602 345 678",
+            "R.drawable.profile10"
+        )
     )
     ToDoCitasTheme {
         ListaClientesView(
