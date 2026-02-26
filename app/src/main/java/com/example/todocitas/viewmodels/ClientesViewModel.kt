@@ -33,10 +33,10 @@ class   ClientesViewModel @Inject constructor(
     private val _searchQuery = MutableStateFlow("")
     val searchQuery = _searchQuery.asStateFlow()
 
-    // El número de registros por página es una constante.
+    // Registros por página es una constante.
     private val registrosPorPagina = 5
 
-    // Total de páginas ahora reacciona al `searchQuery`.
+    // Total de páginas ahora reacciona al "searchQuery".
     @OptIn(ExperimentalCoroutinesApi::class)
     val totalPaginas: StateFlow<Int> = _searchQuery.flatMapLatest { query ->
         if (query.isBlank()) {
@@ -48,9 +48,7 @@ class   ClientesViewModel @Inject constructor(
         ceil(totalClientes.toDouble() / registrosPorPagina).toInt().coerceAtLeast(1)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 1)
 
-
-    // LA LISTA DE CLIENTES ---
-    // Ahora reacciona tanto a `paginaActual` como a `searchQuery`.
+    // La Lista de Clientes ahora reacciona tanto a "paginaActual" como a "searchQuery".
     @OptIn(ExperimentalCoroutinesApi::class)
     val clientesPaginados: StateFlow<List<Cliente>> = combine(
         _paginaActual,
@@ -66,35 +64,27 @@ class   ClientesViewModel @Inject constructor(
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-
     init {
-        // Observamos el conteo total de clientes para calcular el número de páginas.
+        // Observa el conteo total de clientes para calcular el número de páginas.
         viewModelScope.launch {
             repository.countClientes().collect { totalClientes ->
                 _totalPaginas.value = ceil(totalClientes.toDouble() / registrosPorPagina).toInt().coerceAtLeast(1)
             }
         }
     }
-    //
+
     fun onSearchQueryChange(newQuery: String) {
         _searchQuery.value = newQuery
-        // ¡Importante! Reiniciamos a la página 1 cada vez que la búsqueda cambia.
+        // Reinicia a la página 1 cada vez que la búsqueda cambia.
         _paginaActual.value = 1
     }
 
     fun cambiarPagina(nuevaPagina: Int) {
-        // Nos aseguramos de que la nueva página esté dentro de los límites.
+        // Asegura que la nueva página esté dentro de los límites.
         if (nuevaPagina >= 1 && nuevaPagina <= _totalPaginas.value) {
             _paginaActual.value = nuevaPagina
         }
     }
-
-    val clientesState: StateFlow<List<Cliente>> = repository.getClientes()
-        .stateIn(
-            scope = viewModelScope, // La corutina vive mientras el ViewModel viva.
-            started = SharingStarted.WhileSubscribed(5000L), // El flujo se mantiene activo 5s después de que la UI deja de observar.
-            initialValue = emptyList() // El valor inicial mientras se cargan los datos.
-        )
 
     suspend fun getClienteById(id: Int): Cliente? {
             return repository.getClienteById(id)

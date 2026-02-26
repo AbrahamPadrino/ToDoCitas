@@ -42,7 +42,7 @@ interface ClientesDao {
     fun searchAndPaginateClientes(query: String, limit: Int, offset: Int): Flow<List<Cliente>>
 
     // FUNCIÓN PARA CONTAR LOS RESULTADOS DE LA BÚSQUEDA
-    // Es crucial para recalcular el número total de páginas según los resultados del filtro.
+    // Crucial para recalcular el número total de páginas según los resultados del filtro.
     @Query("SELECT COUNT(id) FROM clientes WHERE nombre LIKE '%' || :query || '%'")
     fun countSearchResults(query: String): Flow<Int>
 

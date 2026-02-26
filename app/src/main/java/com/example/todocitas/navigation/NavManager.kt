@@ -40,7 +40,6 @@ fun NavManager() {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val navController = rememberNavController()
-
     // Para saber en qué ruta estamos y resaltar el item correcto del menú
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route ?: Views.InicioView.route
@@ -80,7 +79,6 @@ fun NavManager() {
         val totalPaginas by clientesViewModel.totalPaginas.collectAsState()
         val searchQuery by clientesViewModel.searchQuery.collectAsState()
 
-
         NavHost(
             navController = navController,
             startDestination = Views.InicioView.route
@@ -108,17 +106,21 @@ fun NavManager() {
                         clientesViewModel.cambiarPagina(nuevaPagina)
                     },
                     searchQuery = searchQuery,
-                    onSearchQueryChange = { newQuery -> clientesViewModel.onSearchQueryChange(newQuery) },
+                    onSearchQueryChange = { newQuery ->
+                        clientesViewModel.onSearchQueryChange(
+                            newQuery
+                        )
+                    },
                     navController = navController,
                     openDrawer = { scope.launch { drawerState.open() } },
                     onEditCliente = { cliente ->
-                        // --- 2. NAVEGAMOS A LA RUTA DE EDICIÓN PASANDO EL ID ---
+                        // NAVEGA A LA RUTA DE EDICIÓN PASANDO EL ID
                         navController.navigate(Views.NuevoClienteView.route + "?clienteId=${cliente.id}")
                     },
                     onDeleteCliente = { cliente -> clientesViewModel.eliminarCliente(cliente) }
                 )
             }
-            // Se añade un argumento opcional `clienteId`. Si no se pasa, es una creación. Si se pasa, es una edición.
+            // Se añade un argumento opcional "clienteId". Si no se pasa, es una creación. Si se pasa, es una edición.
             composable(
                 route = Views.NuevoClienteView.route + "?clienteId={clienteId}",
                 arguments = listOf(navArgument("clienteId") {
@@ -150,7 +152,6 @@ fun NavManager() {
                     openDrawer = { scope.launch { drawerState.open() } }
                 )
             }
-
             composable(Views.NuevoServicioView.route) {
                 NuevoServicioView(
                     navController = navController,
