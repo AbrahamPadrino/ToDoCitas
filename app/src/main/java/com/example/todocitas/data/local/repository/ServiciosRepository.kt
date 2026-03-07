@@ -16,7 +16,7 @@ class ServiciosRepository @Inject constructor(private val serviciosDao: Servicio
     }
 
     // Las operaciones de escritura se delegan al DAO dentro de funciones suspend.
-    suspend fun guardarServicio(servicio: Servicio) {
+    suspend fun insertServicio(servicio: Servicio) {
         serviciosDao.insertServicio(servicio)
     }
 
@@ -24,7 +24,7 @@ class ServiciosRepository @Inject constructor(private val serviciosDao: Servicio
         serviciosDao.updateServicio(servicio)
     }
 
-    suspend fun eliminarServicio(servicio: Servicio) {
+    suspend fun deleteServicio(servicio: Servicio) {
         serviciosDao.deleteServicio(servicio)
     }
 }

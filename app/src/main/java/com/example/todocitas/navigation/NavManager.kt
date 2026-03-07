@@ -157,7 +157,7 @@ fun NavManager() {
                     navController = navController,
                     openDrawer = { scope.launch { drawerState.open() } },
                     onBack = { navController.popBackStack() },
-                    onSaveService = { serviciosViewModel.guardarServicio(it) }
+                    onSaveService = { serviciosViewModel.agregarServicio(it) }
                 )
             }
             composable(Views.ListaCitasView.route) {

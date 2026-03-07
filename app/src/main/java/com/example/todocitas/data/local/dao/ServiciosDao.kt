@@ -24,10 +24,10 @@ interface ServiciosDao {
     suspend fun getServicioById(id: Int): Servicio?
 
     /**
-     * Inserta un nuevo servicio. Si ya existe (conflicto de PrimaryKey), lo reemplaza.
+     * Inserta un nuevo servicio.
      * Es una función 'suspend' porque es una operación de I/O y no debe bloquear el hilo principal.
      */
-    @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
+    @Insert
     suspend fun insertServicio(servicio: Servicio)
 
     /**

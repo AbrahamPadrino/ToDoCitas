@@ -6,6 +6,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
@@ -72,7 +73,11 @@ fun NuevoServicioView(
             )
         }
     ) { paddingValues ->
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -116,15 +121,14 @@ fun NuevoServicioView(
                 }
 
                 // Espaciador para dejar sitio a los botones flotantes
-                Spacer(modifier = Modifier.height(180.dp))
+                Spacer(modifier = Modifier.height(200.dp))
             }
-
             // Footer con botones y gradiente
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
-                    .height(200.dp)
+                    .navigationBarsPadding()
                     .background(
                         Brush.verticalGradient(
                             colors = listOf(
@@ -139,7 +143,7 @@ fun NuevoServicioView(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 24.dp, vertical = 24.dp),
+                        .padding(horizontal = 24.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Button(
@@ -151,7 +155,7 @@ fun NuevoServicioView(
                         colors = ButtonDefaults.buttonColors(containerColor = Primary)
                     ) {
                         Icon(
-                            Icons.Default.CheckCircle,
+                            Icons.Default.AddCircle,
                             contentDescription = null
                         )
                         Spacer(modifier = Modifier.width(8.dp))

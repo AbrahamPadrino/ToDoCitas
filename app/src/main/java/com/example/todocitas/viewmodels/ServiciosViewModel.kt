@@ -40,10 +40,10 @@ class ServiciosViewModel @Inject constructor (
         }
     }
 
-    fun guardarServicio(servicio: Servicio) {
+    fun agregarServicio(servicio: Servicio) {
         // Ejecuta la operación de guardado en una corutina
         viewModelScope.launch {
-            repository.guardarServicio(servicio)
+            repository.insertServicio(servicio)
         }
     }
 
@@ -55,7 +55,7 @@ class ServiciosViewModel @Inject constructor (
 
     fun eliminarServicio(servicio: Servicio) {
         viewModelScope.launch {
-            repository.eliminarServicio(servicio)
+            repository.deleteServicio(servicio)
         }
     }
 }
