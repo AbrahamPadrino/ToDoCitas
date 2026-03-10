@@ -4,6 +4,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
@@ -13,10 +15,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,6 +44,8 @@ fun NuevoServicioView(
     var nombre by remember { mutableStateOf("") }
     var precio by remember { mutableStateOf("") }
     var descripcion by remember { mutableStateOf("") }
+
+    val focusManager = LocalFocusManager.current
 
     Scaffold(
         containerColor = BackgroundDark,
@@ -99,7 +106,15 @@ fun NuevoServicioView(
                         onValueChange = { nombre = it },
                         label = "Nombre",
                         placeholder = "Ej. Corte de pelo",
-                        singleLine = true
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Text,
+                            imeAction = ImeAction.Next // Cambia la tecla enter por "Siguiente"
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onNext = { focusManager.moveFocus(FocusDirection.Down) } // Mueve el foco abajo
+                        )
+
                     )
                     CustomTextField(
                         value = precio,
@@ -107,8 +122,15 @@ fun NuevoServicioView(
                         label = "Precio",
                         placeholder = "0.00",
                         leadingIcon = { Text("€", color = TextSecondary, fontSize = 16.sp) },
-                        keyboardType = KeyboardType.Number,
-                        singleLine = true
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number,
+                            imeAction = ImeAction.Next
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                        )
+
                     )
                     CustomTextField(
                         value = descripcion,
@@ -116,7 +138,14 @@ fun NuevoServicioView(
                         label = "Descripción",
                         placeholder = "Describe brevemente el servicio...",
                         singleLine = false,
-                        modifier = Modifier.height(120.dp) // Altura para el campo de texto multi-línea
+                        modifier = Modifier.height(120.dp), // Altura para el campo de texto multi-línea
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Text,
+                            imeAction = ImeAction.Done // Cambia la tecla enter por "Hecho"
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = { focusManager.clearFocus() } // Oculta el foco y el teclado
+                        )
                     )
                 }
 

@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -25,11 +27,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -60,6 +65,7 @@ fun NuevoClienteView(
     var mostrarDialogo by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
+    val focusManager = LocalFocusManager.current
 
     LaunchedEffect(key1 = clienteId) {
         if (clienteId != -1) {
@@ -233,27 +239,55 @@ fun NuevoClienteView(
                         value = nombre,
                         onValueChange = { nombre = it },
                         label = "Nombre",
-                        placeholder = "Ej. Juan"
+                        placeholder = "Ej. Juan",
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Text,
+                            imeAction = ImeAction.Next // Cambia la tecla enter por "Siguiente"
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onNext = { focusManager.moveFocus(FocusDirection.Down) } // Mueve el foco abajo
+                        )
                     )
                     CustomTextField(
                         value = apellido,
                         onValueChange = { apellido = it },
                         label = "Apellido",
-                        placeholder = "Ej. Pérez"
+                        placeholder = "Ej. Pérez",
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Text,
+                            imeAction = ImeAction.Next // Cambia la tecla enter por "Siguiente"
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onNext = { focusManager.moveFocus(FocusDirection.Down) } // Mueve el foco abajo
+                        )
                     )
                     CustomTextField(
                         value = correo,
                         onValueChange = { correo = it },
                         label = "Correo",
                         placeholder = "ejemplo@correo.com",
-                        keyboardType = KeyboardType.Email
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Email,
+                            imeAction = ImeAction.Next // Cambia la tecla enter por "Siguiente"
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onNext = { focusManager.moveFocus(FocusDirection.Down) } // Mueve el foco abajo
+                        )
+
                     )
                     CustomTextField(
                         value = telefono,
                         onValueChange = { telefono = it },
                         label = "Teléfono",
                         placeholder = "+34 600 000 000",
-                        keyboardType = KeyboardType.Phone
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Phone,
+                            imeAction = ImeAction.Done // Cambia la tecla enter por "Hecho"
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = { focusManager.clearFocus() } // Oculta el foco y el teclado
+                        )
+
                     )
                 }
 
