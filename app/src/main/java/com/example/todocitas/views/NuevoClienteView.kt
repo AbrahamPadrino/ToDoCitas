@@ -1,6 +1,7 @@
 package com.example.todocitas.views
 
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import java.io.File // Import para manejar archivos
@@ -46,6 +47,8 @@ import com.example.todocitas.viewmodels.ClientesViewModel
 import com.example.todocitas.data.local.entities.Cliente
 import androidx.core.net.toUri
 import androidx.navigation.NavController
+import com.example.todocitas.utils.FormValidator
+import com.example.todocitas.utils.ValidationResult
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -151,7 +154,7 @@ fun NuevoClienteView(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top =paddingValues.calculateTopPadding())
+                    .padding(top = paddingValues.calculateTopPadding())
                     .padding(horizontal = 24.dp)
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -308,7 +311,7 @@ fun NuevoClienteView(
                                 BackgroundDark.copy(alpha = 0.95f),
                                 BackgroundDark
                             )
-                    )
+                        )
                     )
                     .padding(horizontal = 24.dp, vertical = 58.dp),
                 contentAlignment = Alignment.BottomCenter
@@ -322,33 +325,53 @@ fun NuevoClienteView(
                     // Botones de acción
                     Button(
                         onClick = {
-                            if (clienteId == -1) {
-                                // Modo Creación
-                                clientesViewModel.agregarCliente(
-                                    Cliente(
-                                        nombre = nombre,
-                                        apellido = apellido,
-                                        correo = correo,
-                                        telefono = telefono,
-                                        imagenUri = imagenUri?.toString()
-                                    )
-                                )
-                            } else {
-                                // Modo Edición
-                                clientesViewModel.updateCliente(
-                                    Cliente(
-                                        id = clienteId, // ¡Mantenemos el ID original!
-                                        nombre = nombre,
-                                        apellido = apellido,
-                                        correo = correo,
-                                        telefono = telefono,
-                                        imagenUri = imagenUri?.toString()
-                                    )
-                                )
+
+                            // 1. Ejecuta la validación
+                            val validation = FormValidator.validateEmptyFields(
+                                nombre to "Nombre",
+                                apellido to "Apellido",
+                                correo to "Correo",
+                                telefono to "Teléfono"
+                            )
+                            // 2. Evalua el resultado
+                            when (validation) {
+                                is ValidationResult.Success -> {
+                                    // Procede si está correcto
+                                    if (clienteId == -1) {
+                                        // Modo Creación
+                                        clientesViewModel.agregarCliente(
+                                            Cliente(
+                                                nombre = nombre,
+                                                apellido = apellido,
+                                                correo = correo,
+                                                telefono = telefono,
+                                                imagenUri = imagenUri?.toString()
+                                            )
+                                        )
+                                    } else {
+                                        // Modo Edición
+                                        clientesViewModel.updateCliente(
+                                            Cliente(
+                                                id = clienteId, // ¡Mantenemos el ID original!
+                                                nombre = nombre,
+                                                apellido = apellido,
+                                                correo = correo,
+                                                telefono = telefono,
+                                                imagenUri = imagenUri?.toString()
+                                            )
+                                        )
+                                    }
+                                    mostrarDialogo = true
+
+                                }
+
+                                is ValidationResult.Error -> {
+                                    // Mostrar el error específico al usuario
+                                    Toast.makeText(context, validation.message, Toast.LENGTH_SHORT).show()
+                                }
                             }
 
-                            mostrarDialogo = true
-                        },
+                        }, // fin onClick
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp),

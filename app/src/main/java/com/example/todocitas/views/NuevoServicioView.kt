@@ -1,5 +1,6 @@
 package com.example.todocitas.views
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -31,6 +32,8 @@ import androidx.navigation.NavController
 import com.example.todocitas.components.CustomTextField
 import com.example.todocitas.data.local.entities.Servicio
 import com.example.todocitas.ui.theme.*
+import com.example.todocitas.utils.FormValidator
+import com.example.todocitas.utils.ValidationResult
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,6 +48,7 @@ fun NuevoServicioView(
     var precio by remember { mutableStateOf("") }
     var descripcion by remember { mutableStateOf("") }
 
+    val context = LocalContext.current
     val focusManager = LocalFocusManager.current
 
     Scaffold(
@@ -176,7 +180,33 @@ fun NuevoServicioView(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Button(
-                        onClick = { /* Acción para guardar servicio */ },
+                        onClick = {
+                            val validation = FormValidator.validateEmptyFields(
+                                nombre to "Nombre del servicio",
+                                precio to "Precio",
+                                descripcion to "Descripción"
+                            )
+
+                            when (validation) {
+                                is ValidationResult.Success -> {
+                                    val nuevoServicio = Servicio(
+                                        id = 0,
+                                        nombre = nombre,
+                                        precio = precio.toDoubleOrNull() ?: 0.0,
+                                        descripcion = descripcion
+                                    )
+                                    onSaveService(nuevoServicio)
+                                    // Aquí podría mostrar un diálogo de éxito o volver atrás
+                                }
+                                is ValidationResult.Error -> {
+                                    Toast.makeText(context, validation.message, Toast.LENGTH_SHORT).show()
+                                }
+
+                            }
+
+                        },
+
+
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(52.dp),
