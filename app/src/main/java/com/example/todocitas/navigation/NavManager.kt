@@ -137,9 +137,7 @@ fun NavManager() {
                     openDrawer = { scope.launch { drawerState.open() } },
                     clienteId = clienteId, // Pasa el ID a la vista
                     clientesViewModel = clientesViewModel, // Pasa el ViewModel completo
-                    onSaveComplete = {
-                        navController.popBackStack()
-                    }
+                    onSaveComplete = { navController.popBackStack() }
                 )
             }
 
@@ -152,12 +150,23 @@ fun NavManager() {
                     openDrawer = { scope.launch { drawerState.open() } }
                 )
             }
-            composable(Views.NuevoServicioView.route) {
+            composable(
+                route = Views.NuevoServicioView.route + "?servicioId={servicioId}",
+                arguments = listOf(navArgument("servicioId") {
+                    type = NavType.IntType
+                    defaultValue = -1
+                })
+            ) { backStackEntry ->
+                val servicioId = backStackEntry.arguments?.getInt("servicioId") ?: -1
+
                 NuevoServicioView(
+                    sevicioId = servicioId,
                     navController = navController,
                     openDrawer = { scope.launch { drawerState.open() } },
                     onBack = { navController.popBackStack() },
-                    onSaveService = { serviciosViewModel.agregarServicio(it) }
+                    onSaveService = { serviciosViewModel.agregarServicio(it) },
+                    onSaveComplete = { navController.popBackStack() },
+                    serviciosViewModel = serviciosViewModel
                 )
             }
             composable(Views.ListaCitasView.route) {

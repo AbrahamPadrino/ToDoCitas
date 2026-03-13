@@ -422,7 +422,7 @@ fun NuevoClienteView(
             }
         }
     }
-
+    // Dialogo de confirmación
     if (mostrarDialogo) {
         AlertDialog(
             onDismissRequest = {
@@ -447,7 +447,7 @@ fun NuevoClienteView(
                 TextButton(
                     onClick = {
                         mostrarDialogo = false
-                        onSaveComplete() // Usamos el callback para navegar hacia atrás
+                        onSaveComplete() // Uso de callback para navegar hacia atrás
                     }
                 ) {
                     Text("Confirmar", color = Primary, fontWeight = FontWeight.Bold)

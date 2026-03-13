@@ -36,16 +36,20 @@ import com.example.todocitas.viewmodels.ServiciosViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NuevoServicioView(
+    sevicioId: Int,
     onBack: () -> Unit,
     navController: NavController,
     openDrawer: () -> Unit,
     onSaveService: (Servicio) -> Unit = {},
+    onSaveComplete: () -> Unit,
     serviciosViewModel: ServiciosViewModel = hiltViewModel()
 ) {
 
     var nombre by remember { mutableStateOf("") }
     var precio by remember { mutableStateOf("") }
     var descripcion by remember { mutableStateOf("") }
+
+    var mostrarDialogo by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
@@ -209,6 +213,7 @@ fun NuevoServicioView(
                                 onSaveService(nuevoServicio)
                                 //onBack() // Navegar atrás tras éxito
                             }
+                            mostrarDialogo = true
 
                         },
 
@@ -243,6 +248,43 @@ fun NuevoServicioView(
             }
         }
     }
+
+    // Dialogo de confirmación
+    if (mostrarDialogo) {
+        AlertDialog(
+            onDismissRequest = {
+                // Se llama cuando el usuario presiona fuera del diálogo.
+                // También cerramos la pantalla en este caso.
+                onBack()
+            },
+            title = {
+                Text(
+                    text = "¡Finalizado!",
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+            },
+            text = {
+                Text(
+                    if (sevicioId == -1) "Servicio guardado con éxito" else "Servicio actualizado con éxito",
+                    color = TextSecondary
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        mostrarDialogo = false
+                        onSaveComplete() // Uso de callback para navegar hacia atrás
+                    }
+                ) {
+                    Text("Confirmar", color = Primary, fontWeight = FontWeight.Bold)
+                }
+            },
+            containerColor = CardDark,
+            titleContentColor = Color.White,
+            textContentColor = TextSecondary
+        )
+    }
 }
 
 // --- Preview para Android Studio ---
@@ -251,6 +293,9 @@ fun NuevoServicioView(
 fun NuevoServicioViewPreview() {
     ToDoCitasTheme {
         NuevoServicioView(
+            sevicioId = TODO(),
+            onSaveService = {},
+            onSaveComplete = {},
             navController = NavController(LocalContext.current),
             openDrawer = {},
             onBack = {}
