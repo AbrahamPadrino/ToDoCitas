@@ -1,6 +1,9 @@
 package com.example.todocitas.viewmodels
 
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.todocitas.data.local.entities.Cliente
@@ -18,11 +21,58 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.ceil
+import android.util.Patterns.EMAIL_ADDRESS
+import android.util.Patterns.PHONE
 
 @HiltViewModel
 class   ClientesViewModel @Inject constructor(
     private val repository: ClientesRepository
 ) : ViewModel() {
+
+    /** Inicio de la logica de manejo de validación de campos*/
+    // Estado para los errores
+    var errorState by mutableStateOf(ClienteFormErrorState())
+        private set
+
+    // Función para validar
+    fun validarCampos(nombre: String, apellido: String, correo: String, telefono: String): Boolean {
+        val nombreEsValido = nombre.isNotBlank()
+        val apellidoEsValido = apellido.isNotBlank()
+        val correoEsValido = correo.isNotBlank() && EMAIL_ADDRESS.matcher(correo).matches()
+        val telefonoEsValido = telefono.isNotBlank() && PHONE.matcher(telefono).matches()
+
+        errorState = ClienteFormErrorState(
+            nombreError = if (nombreEsValido) null else "El nombre no puede estar vacío",
+            apellidoError = if (apellidoEsValido) null else "El apellido no puede estar vacío",
+            correoError = if (correoEsValido) null else "Ingrese un correo válido",
+            telefonoError = if (telefonoEsValido) null else "Ingrese un número de teléfono válido"
+        )
+
+        return nombreEsValido && apellidoEsValido && correoEsValido && telefonoEsValido
+    }
+    // Función para limpiar el error de un campo cuando el usuario vuelve a escribir
+    fun onNombreChange() {
+        if (errorState.nombreError != null) {
+            errorState = errorState.copy(nombreError = null)
+        }
+    }
+    fun onApellidoChange() {
+        if (errorState.apellidoError != null) {
+            errorState = errorState.copy(apellidoError = null)
+        }
+    }
+    fun onCorreoChange() {
+        if (errorState.correoError != null) {
+            errorState = errorState.copy(correoError = null)
+        }
+    }
+    fun onTelefonoChange() {
+        if (errorState.telefonoError != null) {
+            errorState = errorState.copy(telefonoError = null)
+        }
+    }
+    /** Fin de la logica de manejo de validación de campos*/
+
 
     private val _paginaActual = MutableStateFlow(1)
     val paginaActual = _paginaActual.asStateFlow()
@@ -109,3 +159,11 @@ class   ClientesViewModel @Inject constructor(
         }
     }
 }
+
+// Data class para representar los errores del formulario
+data class ClienteFormErrorState(
+    val nombreError: String? = null,
+    val apellidoError: String? = null,
+    val correoError: String? = null,
+    val telefonoError: String? = null
+)

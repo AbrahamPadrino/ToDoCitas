@@ -39,17 +39,19 @@ fun CustomTextField(
     leadingIcon: (@Composable () -> Unit)? = null,
     modifier: Modifier = Modifier,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    keyboardActions: KeyboardActions = KeyboardActions.Default // Usamos .Default para consistencia
+    keyboardActions: KeyboardActions = KeyboardActions.Default, // Usamos .Default para consistencia
+    isError: Boolean = false,
+    errorMessage: String? = null
 
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = label,
-            color = Color.White,
+            color = if (isError) Color.Red else Color.White,
             fontWeight = FontWeight.Medium,
             fontSize = 14.sp,
             modifier = Modifier.fillMaxWidth()
@@ -64,6 +66,16 @@ fun CustomTextField(
             singleLine = singleLine,
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions,
+            isError = isError, // <--- Propiedad nativa de Material3
+            supportingText = { // <--- Texto debajo del campo
+                if (isError && errorMessage != null) {
+                    Text(
+                        text = errorMessage,
+                        color = Color.Red,
+                        fontSize = 12.sp
+                    )
+                }
+            },
             colors = OutlinedTextFieldDefaults.colors(
                 unfocusedContainerColor = CardDark,
                 focusedContainerColor = CardDark,
@@ -71,6 +83,10 @@ fun CustomTextField(
                 unfocusedTextColor = Color.White,
                 focusedBorderColor = Primary,
                 unfocusedBorderColor = BorderDark,
+                // Colores específicos para el estado de error
+                errorBorderColor = Color.Red,
+                errorLeadingIconColor = Color.Red,
+                errorCursorColor = Color.Red
             )
         )
     }

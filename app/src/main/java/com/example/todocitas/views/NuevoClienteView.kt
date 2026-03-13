@@ -1,7 +1,6 @@
 package com.example.todocitas.views
 
 import android.net.Uri
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import java.io.File // Import para manejar archivos
@@ -46,9 +45,8 @@ import com.example.todocitas.ui.theme.*
 import com.example.todocitas.viewmodels.ClientesViewModel
 import com.example.todocitas.data.local.entities.Cliente
 import androidx.core.net.toUri
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.example.todocitas.utils.FormValidator
-import com.example.todocitas.utils.ValidationResult
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,8 +55,8 @@ fun NuevoClienteView(
     navController: NavController,
     openDrawer: () -> Unit,
     clienteId: Int,
-    clientesViewModel: ClientesViewModel,
-    onSaveComplete: () -> Unit
+    onSaveComplete: () -> Unit,
+    clientesViewModel: ClientesViewModel = hiltViewModel()
 ) {
     var nombre by remember { mutableStateOf("") }
     var apellido by remember { mutableStateOf("") }
@@ -69,6 +67,9 @@ fun NuevoClienteView(
 
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
+
+    // Obtenemos el estado de error del ViewModel
+    val errorState = clientesViewModel.errorState
 
     LaunchedEffect(key1 = clienteId) {
         if (clienteId != -1) {
@@ -230,19 +231,24 @@ fun NuevoClienteView(
                     fontSize = 14.sp
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(6.dp))
 
                 // Campos de texto del formulario
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.Start,
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     CustomTextField(
                         value = nombre,
-                        onValueChange = { nombre = it },
+                        onValueChange = {
+                            nombre = it
+                            clientesViewModel.onNombreChange() // Limpia el error al escribir
+                        },
                         label = "Nombre",
                         placeholder = "Ej. Juan",
+                        isError = errorState.nombreError != null, // <--- Conexión
+                        errorMessage = errorState.nombreError,    // <--- Conexión
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Text,
                             imeAction = ImeAction.Next // Cambia la tecla enter por "Siguiente"
@@ -253,9 +259,14 @@ fun NuevoClienteView(
                     )
                     CustomTextField(
                         value = apellido,
-                        onValueChange = { apellido = it },
+                        onValueChange = {
+                            apellido = it
+                            clientesViewModel.onApellidoChange() // Limpia el error al escribir
+                        },
                         label = "Apellido",
                         placeholder = "Ej. Pérez",
+                        isError = errorState.apellidoError != null, // <--- Conexión
+                        errorMessage = errorState.apellidoError,    // <--- Conexión
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Text,
                             imeAction = ImeAction.Next // Cambia la tecla enter por "Siguiente"
@@ -266,9 +277,14 @@ fun NuevoClienteView(
                     )
                     CustomTextField(
                         value = correo,
-                        onValueChange = { correo = it },
+                        onValueChange = {
+                            correo = it
+                            clientesViewModel.onCorreoChange() // Limpia el error al escribir
+                            },
                         label = "Correo",
                         placeholder = "ejemplo@correo.com",
+                        isError = errorState.correoError != null, // <--- Conexión
+                        errorMessage = errorState.correoError,    // <--- Conexión
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Email,
                             imeAction = ImeAction.Next // Cambia la tecla enter por "Siguiente"
@@ -280,9 +296,14 @@ fun NuevoClienteView(
                     )
                     CustomTextField(
                         value = telefono,
-                        onValueChange = { telefono = it },
+                        onValueChange = {
+                            telefono = it
+                            clientesViewModel.onTelefonoChange() // Limpia el error al escribir
+                            },
                         label = "Teléfono",
                         placeholder = "+34 600 000 000",
+                        isError = errorState.telefonoError != null, // <--- Conexión
+                        errorMessage = errorState.telefonoError,    // <--- Conexión
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Phone,
                             imeAction = ImeAction.Done // Cambia la tecla enter por "Hecho"
@@ -325,18 +346,9 @@ fun NuevoClienteView(
                     // Botones de acción
                     Button(
                         onClick = {
-
-                            // 1. Ejecuta la validación
-                            val validation = FormValidator.validateEmptyFields(
-                                nombre to "Nombre",
-                                apellido to "Apellido",
-                                correo to "Correo",
-                                telefono to "Teléfono"
-                            )
-                            // 2. Evalua el resultado
-                            when (validation) {
-                                is ValidationResult.Success -> {
-                                    // Procede si está correcto
+                            // Llama a la validación del ViewModel
+                            when {
+                                clientesViewModel.validarCampos(nombre, apellido, correo, telefono) -> {
                                     if (clienteId == -1) {
                                         // Modo Creación
                                         clientesViewModel.agregarCliente(
@@ -363,11 +375,6 @@ fun NuevoClienteView(
                                     }
                                     mostrarDialogo = true
 
-                                }
-
-                                is ValidationResult.Error -> {
-                                    // Mostrar el error específico al usuario
-                                    Toast.makeText(context, validation.message, Toast.LENGTH_SHORT).show()
                                 }
                             }
 

@@ -1,6 +1,5 @@
 package com.example.todocitas.views
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -10,7 +9,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -28,12 +26,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.todocitas.components.CustomTextField
 import com.example.todocitas.data.local.entities.Servicio
 import com.example.todocitas.ui.theme.*
-import com.example.todocitas.utils.FormValidator
-import com.example.todocitas.utils.ValidationResult
+import com.example.todocitas.viewmodels.ServiciosViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,7 +39,8 @@ fun NuevoServicioView(
     onBack: () -> Unit,
     navController: NavController,
     openDrawer: () -> Unit,
-    onSaveService: (Servicio) -> Unit = {}
+    onSaveService: (Servicio) -> Unit = {},
+    serviciosViewModel: ServiciosViewModel = hiltViewModel()
 ) {
 
     var nombre by remember { mutableStateOf("") }
@@ -50,6 +49,9 @@ fun NuevoServicioView(
 
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
+
+    // Obtener el estado de error del ViewModel
+    val errorState = serviciosViewModel.errorState
 
     Scaffold(
         containerColor = BackgroundDark,
@@ -107,10 +109,15 @@ fun NuevoServicioView(
                 ) {
                     CustomTextField(
                         value = nombre,
-                        onValueChange = { nombre = it },
+                        onValueChange = {
+                            nombre = it
+                            serviciosViewModel.onNombreChange() // Limpia el error al escribir //
+                        },
                         label = "Nombre",
                         placeholder = "Ej. Corte de pelo",
                         singleLine = true,
+                        isError = errorState.nombreError != null, // <--- Conexión
+                        errorMessage = errorState.nombreError,    // <--- Conexión
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Text,
                             imeAction = ImeAction.Next // Cambia la tecla enter por "Siguiente"
@@ -122,10 +129,15 @@ fun NuevoServicioView(
                     )
                     CustomTextField(
                         value = precio,
-                        onValueChange = { precio = it },
+                        onValueChange = {
+                            precio = it
+                            serviciosViewModel.onPrecioChange()
+                        },
                         label = "Precio",
                         placeholder = "0.00",
-                        leadingIcon = { Text("€", color = TextSecondary, fontSize = 16.sp) },
+                        isError = errorState.precioError != null,
+                        errorMessage = errorState.precioError,
+                        leadingIcon = { Text("$", color = TextSecondary, fontSize = 16.sp) },
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Number,
@@ -138,9 +150,14 @@ fun NuevoServicioView(
                     )
                     CustomTextField(
                         value = descripcion,
-                        onValueChange = { descripcion = it },
+                        onValueChange = {
+                            descripcion = it
+                            serviciosViewModel.onDescripcionChange()
+                            },
                         label = "Descripción",
                         placeholder = "Describe brevemente el servicio...",
+                        isError = errorState.descripcionError != null,
+                        errorMessage = errorState.descripcionError,
                         singleLine = false,
                         modifier = Modifier.height(120.dp), // Altura para el campo de texto multi-línea
                         keyboardOptions = KeyboardOptions(
@@ -181,27 +198,16 @@ fun NuevoServicioView(
                 ) {
                     Button(
                         onClick = {
-                            val validation = FormValidator.validateEmptyFields(
-                                nombre to "Nombre del servicio",
-                                precio to "Precio",
-                                descripcion to "Descripción"
-                            )
-
-                            when (validation) {
-                                is ValidationResult.Success -> {
-                                    val nuevoServicio = Servicio(
-                                        id = 0,
-                                        nombre = nombre,
-                                        precio = precio.toDoubleOrNull() ?: 0.0,
-                                        descripcion = descripcion
-                                    )
-                                    onSaveService(nuevoServicio)
-                                    // Aquí podría mostrar un diálogo de éxito o volver atrás
-                                }
-                                is ValidationResult.Error -> {
-                                    Toast.makeText(context, validation.message, Toast.LENGTH_SHORT).show()
-                                }
-
+                            // Llama a la validación del ViewModel
+                            if (serviciosViewModel.validarCampos(nombre, precio, descripcion)) {
+                                val nuevoServicio = Servicio(
+                                    id = 0,
+                                    nombre = nombre,
+                                    precio = precio.toDoubleOrNull() ?: 0.0,
+                                    descripcion = descripcion
+                                )
+                                onSaveService(nuevoServicio)
+                                //onBack() // Navegar atrás tras éxito
                             }
 
                         },
