@@ -1,5 +1,8 @@
 package com.example.todocitas.views
 
+import android.R.attr.onClick
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -16,6 +19,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -38,6 +42,7 @@ fun ListaServiciosView(
     openDrawer: () -> Unit
 ) {
     var searchQuery by remember { mutableStateOf("") }
+    var expandedCardId by remember { mutableStateOf<Int?>(null) }
 
     Scaffold(
         containerColor = BackgroundDark,
@@ -102,7 +107,13 @@ fun ListaServiciosView(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(servicios.filter { it.nombre.contains(searchQuery, ignoreCase = true) }) { servicio ->
-                    ServiceCard(servicio = servicio)
+                    ServiceCard(
+                        servicio = servicio,
+                        isExpanded = expandedCardId == servicio.id,
+                        onExpand = {
+                            expandedCardId = if (expandedCardId == servicio.id) null else servicio.id
+                        }
+                    )
                 }
             }
         }
@@ -112,23 +123,29 @@ fun ListaServiciosView(
 @Composable
 fun ServiceCard(
     servicio: Servicio,
+    isExpanded: Boolean,
+    onExpand: () -> Unit,
     onEditClick: () -> Unit = {},
     onDeleteClick: () -> Unit = {}
 ) {
+    // Animación de rotación para el icono de la flecha
+    val rotationAngle by animateFloatAsState(
+        targetValue = if (isExpanded) 180f else 0f,
+        label = "rotation"
+    )
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
             .background(CardDark)
-            .clickable { /* Podrías añadir una acción al hacer clic en la tarjeta */ }
+            .clickable(onClick = onExpand) // El clic en toda la tarjeta la expande/contrae
             .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Fila superior: Título, precio y botones
+        // Información del servicio
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.Top,
-            horizontalArrangement = Arrangement.SpaceBetween
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
@@ -145,25 +162,40 @@ fun ServiceCard(
                     fontSize = 18.sp,
                     modifier = Modifier.padding(top = 4.dp)
                 )
+                Text(
+                    text = servicio.descripcion,
+                    color = TextSecondary,
+                    fontSize = 14.sp,
+                    lineHeight = 20.sp
+                )
             }
-            // Botones de acción
-            Row {
-                IconButton(onClick = onEditClick, modifier = Modifier.size(36.dp)) {
-                    Icon(Icons.Default.Edit, contentDescription = "Editar", tint = TextSecondary)
-                }
-                IconButton(onClick = onDeleteClick, modifier = Modifier.size(36.dp)) {
-                    Icon(Icons.Default.Delete, contentDescription = "Eliminar", tint = TextSecondary)
-                }
-            }
-        }
 
-        // Descripción
-        Text(
-            text = servicio.descripcion,
-            color = TextSecondary,
-            fontSize = 14.sp,
-            lineHeight = 20.sp
-        )
+            Icon(
+                imageVector = Icons.Default.KeyboardArrowDown,
+                contentDescription = "Expandir/Contraer",
+                tint = TextSecondary,
+                modifier = Modifier.rotate(rotationAngle) // Aplica la rotación animada
+            )
+        }
+            // Botones de acción
+            AnimatedVisibility(visible = isExpanded) {
+                Row(
+                    modifier = Modifier.padding(top = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    ActionButton(
+                        icon = Icons.Default.Edit,
+                        modifier = Modifier.weight(1f),
+                        onClick = {}
+                    )
+                    ActionButton(
+                        icon = Icons.Default.Delete,
+                        isDelete = true,
+                        modifier = Modifier.weight(1f),
+                        onClick = {}
+                    )
+                }
+            }
     }
 }
 
