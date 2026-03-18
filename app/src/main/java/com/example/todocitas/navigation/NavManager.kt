@@ -147,7 +147,10 @@ fun NavManager() {
                     onAddNewService = { navController.navigate(Views.NuevoServicioView.route) },
                     servicios = serviciosViewModel.serviciosState.listaServicios,
                     navController = navController,
-                    openDrawer = { scope.launch { drawerState.open() } }
+                    openDrawer = { scope.launch { drawerState.open() } },
+                    onEditServicio = { servicio ->
+                        navController.navigate(Views.NuevoServicioView.route + "?servicioId=${servicio.id}")
+                    }
                 )
             }
             composable(
@@ -160,7 +163,7 @@ fun NavManager() {
                 val servicioId = backStackEntry.arguments?.getInt("servicioId") ?: -1
 
                 NuevoServicioView(
-                    sevicioId = servicioId,
+                    servicioId = servicioId,
                     navController = navController,
                     openDrawer = { scope.launch { drawerState.open() } },
                     onBack = { navController.popBackStack() },

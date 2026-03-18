@@ -1,6 +1,5 @@
 package com.example.todocitas.views
 
-import android.R.attr.onClick
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
@@ -39,7 +38,8 @@ fun ListaServiciosView(
     onAddNewService: () -> Unit,
     servicios: List<Servicio>,
     navController: NavController,
-    openDrawer: () -> Unit
+    openDrawer: () -> Unit,
+    onEditServicio: (Servicio) -> Unit
 ) {
     var searchQuery by remember { mutableStateOf("") }
     var expandedCardId by remember { mutableStateOf<Int?>(null) }
@@ -112,7 +112,9 @@ fun ListaServiciosView(
                         isExpanded = expandedCardId == servicio.id,
                         onExpand = {
                             expandedCardId = if (expandedCardId == servicio.id) null else servicio.id
-                        }
+                        },
+
+                        onEdit = { onEditServicio(servicio) }
                     )
                 }
             }
@@ -125,7 +127,7 @@ fun ServiceCard(
     servicio: Servicio,
     isExpanded: Boolean,
     onExpand: () -> Unit,
-    onEditClick: () -> Unit = {},
+    onEdit: () -> Unit,
     onDeleteClick: () -> Unit = {}
 ) {
     // Animación de rotación para el icono de la flecha
@@ -186,7 +188,7 @@ fun ServiceCard(
                     ActionButton(
                         icon = Icons.Default.Edit,
                         modifier = Modifier.weight(1f),
-                        onClick = {}
+                        onClick = onEdit
                     )
                     ActionButton(
                         icon = Icons.Default.Delete,
@@ -216,7 +218,8 @@ fun ListaServiciosViewPreview() {
             onAddNewService = {},
             servicios = sampleServices,
             navController = NavController(LocalContext.current),
-            openDrawer = {}
+            openDrawer = {},
+            onEditServicio = {}
         )
     }
 }

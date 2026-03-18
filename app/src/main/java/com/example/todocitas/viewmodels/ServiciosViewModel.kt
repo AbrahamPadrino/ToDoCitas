@@ -74,10 +74,8 @@ class ServiciosViewModel @Inject constructor (
         }
     }
 
-    fun getServicioById(id: Int) {
-        viewModelScope.launch {
-            repository.obtenerServicioById(id)
-        }
+    suspend fun getServicioById(id: Int): Servicio? {
+        return repository.getServicioById(id)
     }
 
     fun agregarServicio(servicio: Servicio) {

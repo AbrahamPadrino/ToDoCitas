@@ -328,7 +328,7 @@ fun ClientCard(
     }
 }
 
-
+// Componente reutilizable
 @Composable
 fun ActionButton(
     icon: ImageVector,

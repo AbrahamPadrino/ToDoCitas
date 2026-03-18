@@ -11,9 +11,7 @@ class ServiciosRepository @Inject constructor(private val serviciosDao: Servicio
     // Expone el Flow directamente desde el DAO. Es la forma más óptima y reactiva.
     val getServicios: Flow<List<Servicio>> = serviciosDao.getAllServicios()
 
-    suspend fun obtenerServicioById(id: Int): Servicio? {
-        return serviciosDao.getServicioById(id)
-    }
+    suspend fun getServicioById(id: Int): Servicio? = serviciosDao.getServicioById(id)
 
     // Las operaciones de escritura se delegan al DAO dentro de funciones suspend.
     suspend fun insertServicio(servicio: Servicio) {

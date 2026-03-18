@@ -26,6 +26,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.todocitas.components.CustomTextField
@@ -36,7 +37,7 @@ import com.example.todocitas.viewmodels.ServiciosViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NuevoServicioView(
-    sevicioId: Int,
+    servicioId: Int,
     onBack: () -> Unit,
     navController: NavController,
     openDrawer: () -> Unit,
@@ -56,6 +57,19 @@ fun NuevoServicioView(
 
     // Obtener el estado de error del ViewModel
     val errorState = serviciosViewModel.errorState
+
+    // Carga de datos si estamos en modo edición
+    LaunchedEffect(key1 = servicioId) {
+        if (servicioId != -1) {
+            // Si está en modo edición, pide al ViewModel que cargue los datos del cliente.
+            val servicio = serviciosViewModel.getServicioById(servicioId)
+            servicio?.let {
+                nombre = it.nombre
+                precio = it.precio.toString()
+                descripcion = it.descripcion
+            }
+        }
+    }
 
     Scaffold(
         containerColor = BackgroundDark,
@@ -266,7 +280,7 @@ fun NuevoServicioView(
             },
             text = {
                 Text(
-                    if (sevicioId == -1) "Servicio guardado con éxito" else "Servicio actualizado con éxito",
+                    if (servicioId == -1) "Servicio guardado con éxito" else "Servicio actualizado con éxito",
                     color = TextSecondary
                 )
             },
@@ -293,7 +307,7 @@ fun NuevoServicioView(
 fun NuevoServicioViewPreview() {
     ToDoCitasTheme {
         NuevoServicioView(
-            sevicioId = TODO(),
+            servicioId = TODO(),
             onSaveService = {},
             onSaveComplete = {},
             navController = NavController(LocalContext.current),
