@@ -171,7 +171,7 @@ fun NuevoServicioView(
                         onValueChange = {
                             descripcion = it
                             serviciosViewModel.onDescripcionChange()
-                            },
+                        },
                         label = "Descripción",
                         placeholder = "Describe brevemente el servicio...",
                         isError = errorState.descripcionError != null,
@@ -216,22 +216,32 @@ fun NuevoServicioView(
                 ) {
                     Button(
                         onClick = {
-                            // Llama a la validación del ViewModel
-                            if (serviciosViewModel.validarCampos(nombre, precio, descripcion)) {
-                                val nuevoServicio = Servicio(
-                                    id = 0,
-                                    nombre = nombre,
-                                    precio = precio.toDoubleOrNull() ?: 0.0,
-                                    descripcion = descripcion
-                                )
-                                onSaveService(nuevoServicio)
-                                //onBack() // Navegar atrás tras éxito
+                            when {
+                                serviciosViewModel.validarCampos(nombre, precio, descripcion) -> {
+                                    if (servicioId == -1) {
+                                        // Modo Creación
+                                        serviciosViewModel.agregarServicio(
+                                            Servicio(
+                                                nombre = nombre,
+                                                precio = precio.toDoubleOrNull() ?: 0.0,
+                                                descripcion = descripcion
+                                            )
+                                        )
+                                    } else {
+                                        // Modo Edición
+                                        serviciosViewModel.updateServicio(
+                                            Servicio(
+                                                id = servicioId, // ¡Mantenemos el ID original!
+                                                nombre = nombre,
+                                                precio = precio.toDoubleOrNull() ?: 0.0,
+                                                descripcion = descripcion
+                                            )
+                                        )
+                                    }
+                                    mostrarDialogo = true
+                                }
                             }
-                            mostrarDialogo = true
-
-                        },
-
-
+                        }, // fin onClick
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(52.dp),
@@ -243,7 +253,10 @@ fun NuevoServicioView(
                             contentDescription = null
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Guardar", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                        Text(
+                            if (servicioId == -1) "Guardar Servicio" else "Actualizar Servicio",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp)
                     }
                     Button(
                         onClick = onBack,

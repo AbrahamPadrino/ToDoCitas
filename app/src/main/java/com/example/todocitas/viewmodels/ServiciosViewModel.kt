@@ -85,9 +85,9 @@ class ServiciosViewModel @Inject constructor (
         }
     }
 
-    fun actualizarServicio(servicio: Servicio) {
+    fun updateServicio(servicio: Servicio) {
         viewModelScope.launch {
-            repository.actualizarServicio(servicio)
+            repository.updateServicio(servicio)
         }
     }
 

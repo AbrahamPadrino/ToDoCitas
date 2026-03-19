@@ -18,7 +18,7 @@ class ServiciosRepository @Inject constructor(private val serviciosDao: Servicio
         serviciosDao.insertServicio(servicio)
     }
 
-    suspend fun actualizarServicio(servicio: Servicio) {
+    suspend fun updateServicio(servicio: Servicio) {
         serviciosDao.updateServicio(servicio)
     }
 
