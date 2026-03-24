@@ -23,4 +23,18 @@ class ServiciosRepository @Inject constructor(private val serviciosDao: Servicio
     }
 
     suspend fun deleteServicio(servicio: Servicio) = serviciosDao.deleteServicio(servicio)
+
+    // Se exponen las funciones para paginación y búsqueda.
+    fun getServiciosPaginados(limit: Int, offset: Int): Flow<List<Servicio>> {
+        return serviciosDao.getServiciosPaginados(limit, offset)
+    }
+    fun countServicios(): Flow<Int> = serviciosDao.countServicios()
+
+    fun searchAndPaginateServicios(query: String, limit: Int, offset: Int): Flow<List<Servicio>> {
+        return serviciosDao.searchAndPaginateServicios(query, limit, offset)
+    }
+    fun countSearchResults(query: String): Flow<Int> {
+        return serviciosDao.countSearchResults(query)
+    }
+
 }

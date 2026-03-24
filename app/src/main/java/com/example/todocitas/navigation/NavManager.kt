@@ -74,6 +74,8 @@ fun NavManager() {
 
         // Recoge la lista de clientes paginada
         val listaDeClientesPaginada by clientesViewModel.clientesPaginados.collectAsState()
+        val listaDeServiciosPaginada by serviciosViewModel.serviciosPaginados.collectAsState()
+
         // Recoge la información de paginación
         val paginaActual by clientesViewModel.paginaActual.collectAsState()
         val totalPaginas by clientesViewModel.totalPaginas.collectAsState()
@@ -125,7 +127,18 @@ fun NavManager() {
                 ListaServiciosView(
                     onBack = { navController.popBackStack() },
                     onAddNewService = { navController.navigate(Views.NuevoServicioView.route) },
-                    servicios = serviciosViewModel.serviciosState.listaServicios,
+                    servicios = listaDeServiciosPaginada,
+                    paginaActual = paginaActual,
+                    totalPaginas = totalPaginas,
+                    onCambiarPagina = { nuevaPagina ->
+                        serviciosViewModel.cambiarPagina(nuevaPagina)
+                    },
+                    searchQuery = searchQuery,
+                    onSearchQueryChange = { newQuery ->
+                        serviciosViewModel.onSearchQueryChange(
+                            newQuery
+                        )
+                    },
                     navController = navController,
                     openDrawer = { scope.launch { drawerState.open() } },
                     onEditServicio = { servicio ->

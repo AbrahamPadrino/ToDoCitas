@@ -337,7 +337,9 @@ fun ClientCard(
     }
 }
 
-// Componente reutilizable
+/**
+ * Componente reutilizable
+ */
 @Composable
 fun ActionButton(
     icon: ImageVector,
@@ -366,45 +368,9 @@ fun ActionButton(
     }
 }
 
-// Lista sin mas registos
-@Composable
-fun EmptyState(isEndOfList: Boolean = false) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .size(if (isEndOfList) 60.dp else 80.dp)
-                .clip(CircleShape)
-                .background(CardDark),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                Icons.Default.Person,
-                contentDescription = null,
-                tint = TextSecondary,
-                modifier = Modifier.size(if (isEndOfList) 30.dp else 40.dp)
-            )
-        }
-        Text(
-            text = "No hay más clientes",
-            fontWeight = FontWeight.Bold,
-            color = Color.White,
-            fontSize = 18.sp
-        )
-        Text(
-            text = "Presiona '+' para agregar un nuevo cliente.",
-            color = TextSecondary,
-            fontSize = 14.sp,
-            textAlign = TextAlign.Center
-        )
-    }
-}
-
+/**
+ * Componente reutilizable
+ */
 // Controles de Paginación
 @Composable
 fun PaginacionControles(
@@ -454,6 +420,45 @@ fun PaginacionControles(
                 tint = if (paginaActual < totalPaginas) Primary else TextSecondary.copy(alpha = 0.5f)
             )
         }
+    }
+}
+
+// Lista sin mas registos
+@Composable
+fun EmptyState(isEndOfList: Boolean = false) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(if (isEndOfList) 60.dp else 80.dp)
+                .clip(CircleShape)
+                .background(CardDark),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                Icons.Default.Person,
+                contentDescription = null,
+                tint = TextSecondary,
+                modifier = Modifier.size(if (isEndOfList) 30.dp else 40.dp)
+            )
+        }
+        Text(
+            text = "No hay más clientes",
+            fontWeight = FontWeight.Bold,
+            color = Color.White,
+            fontSize = 18.sp
+        )
+        Text(
+            text = "Presiona '+' para agregar un nuevo cliente.",
+            color = TextSecondary,
+            fontSize = 14.sp,
+            textAlign = TextAlign.Center
+        )
     }
 }
 

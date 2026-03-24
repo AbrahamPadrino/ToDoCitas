@@ -43,4 +43,33 @@ interface ServiciosDao {
      */
     @Delete
     suspend fun deleteServicio(servicio: Servicio)
+
+    /**
+     * Consultas para paginar y buscar servicios.
+     */
+    //    LIMIT: cuántos registros traer.
+    //    OFFSET: cuántos registros saltar desde el inicio.
+    @Query("SELECT * FROM servicios ORDER BY nombre ASC LIMIT :limit OFFSET :offset")
+    fun getServiciosPaginados(limit: Int, offset: Int): Flow<List<Servicio>>
+
+    @Query("SELECT COUNT(id) FROM servicios")
+    fun countServicios(): Flow<Int>
+
+    /**
+     * Busqueda paginada y filtrada.
+     */
+    // Busca servicios cuyo nombre contenga el 'query' y devuelve una página de resultados.
+    @Query("""
+        SELECT * FROM servicios
+        WHERE nombre LIKE '%' || :query || '%'
+        LIMIT :limit OFFSET :offset
+    """)
+    fun searchAndPaginateServicios(query: String, limit: Int, offset: Int): Flow<List<Servicio>>
+
+    // Crucial para recalcular el número total de páginas según los resultados del filtro.
+    @Query("SELECT COUNT(id) FROM servicios WHERE nombre LIKE '%' || :query || '%'")
+    fun countSearchResults(query: String): Flow<Int>
+
+
+
 }

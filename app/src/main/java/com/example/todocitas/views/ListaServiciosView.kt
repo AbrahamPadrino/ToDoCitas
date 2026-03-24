@@ -40,14 +40,23 @@ fun ListaServiciosView(
     onBack: () -> Unit,
     onAddNewService: () -> Unit,
     servicios: List<Servicio>,
+    paginaActual: Int,
+    totalPaginas: Int,
+    onCambiarPagina: (Int) -> Unit,
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
     navController: NavController,
     openDrawer: () -> Unit,
     onEditServicio: (Servicio) -> Unit,
     onDeleteServicio: (Servicio) -> Unit
 ) {
-    var searchQuery by remember { mutableStateOf("") }
     var expandedCardId by remember { mutableStateOf<Int?>(null) }
     var servicioAEliminar by remember { mutableStateOf<Servicio?>(null) }
+
+    LaunchedEffect(paginaActual) {
+        // Al cambiar de página, cierra cualquier tarjeta que estuviera expandida.
+        expandedCardId = null
+    }
 
     Scaffold(
         containerColor = BackgroundDark,
@@ -95,18 +104,21 @@ fun ListaServiciosView(
             }
         }
     ) { paddingValues ->
-        Column(modifier = Modifier.padding(paddingValues)) {
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues)
+        ) {
             // Barra de búsqueda (reutilizamos la de ListaClientesView)
             SearchBar(
                 value = searchQuery,
-                onValueChange = { searchQuery = it },
+                onValueChange = onSearchQueryChange,
                 placeholder = "Buscar servicio...",
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp)
             )
-
             // Lista de servicios
+
             LazyColumn(
                 contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 80.dp), // Padding para el FAB
                 verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -124,6 +136,13 @@ fun ListaServiciosView(
                         onDelete = { servicioAEliminar = servicio }
                     )
                 }
+            }
+            if (totalPaginas > 1) {
+                PaginacionControles(
+                    paginaActual = paginaActual,
+                    totalPaginas = totalPaginas,
+                    onCambiarPagina = onCambiarPagina
+                )
             }
         }
     }
@@ -275,6 +294,11 @@ fun ListaServiciosViewPreview() {
             onBack = {},
             onAddNewService = {},
             servicios = sampleServices,
+            paginaActual = 1,
+            totalPaginas = 1,
+            onCambiarPagina = {},
+            searchQuery = "",
+            onSearchQueryChange = {},
             navController = NavController(LocalContext.current),
             openDrawer = {},
             onEditServicio = {},
