@@ -21,8 +21,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -39,10 +42,12 @@ fun ListaServiciosView(
     servicios: List<Servicio>,
     navController: NavController,
     openDrawer: () -> Unit,
-    onEditServicio: (Servicio) -> Unit
+    onEditServicio: (Servicio) -> Unit,
+    onDeleteServicio: (Servicio) -> Unit
 ) {
     var searchQuery by remember { mutableStateOf("") }
     var expandedCardId by remember { mutableStateOf<Int?>(null) }
+    var servicioAEliminar by remember { mutableStateOf<Servicio?>(null) }
 
     Scaffold(
         containerColor = BackgroundDark,
@@ -114,21 +119,74 @@ fun ListaServiciosView(
                             expandedCardId = if (expandedCardId == servicio.id) null else servicio.id
                         },
 
-                        onEdit = { onEditServicio(servicio) }
+                        onEdit = { onEditServicio(servicio) },
+
+                        onDelete = { servicioAEliminar = servicio }
                     )
                 }
             }
         }
     }
-}
 
+    // Dialogo para Confirmar Eliminar
+    servicioAEliminar?.let { servicio ->
+        AlertDialog(
+            onDismissRequest = {servicioAEliminar = null},
+            containerColor = CardDark,
+            title = {
+                Text(
+                    text = "Confirmar Eliminación",
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+            },
+            text = {
+                Text(
+                    text = buildAnnotatedString {
+                        append("¿Seguro deseas eliminar: ")
+                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                            append(servicio.nombre)
+                        }
+                        append("? Esta acción no se puede deshacer.")
+
+                    },
+                    color = TextSecondary
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onDeleteServicio(servicio)
+                        servicioAEliminar = null
+                        // Cierra la Card expandida si estaba abierta.
+                        expandedCardId = null
+                    }
+                ) {
+                    Text("ACEPTAR", color = TextAlert, fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        // Simplemente cierra el diálogo.
+                        servicioAEliminar = null
+                        expandedCardId = null
+                    }
+                ) {
+                    Text("CANCELAR", color = Primary, fontWeight = FontWeight.Normal)
+                }
+            }
+        )
+    }
+
+}
 @Composable
 fun ServiceCard(
     servicio: Servicio,
     isExpanded: Boolean,
     onExpand: () -> Unit,
     onEdit: () -> Unit,
-    onDeleteClick: () -> Unit = {}
+    onDelete: () -> Unit
 ) {
     // Animación de rotación para el icono de la flecha
     val rotationAngle by animateFloatAsState(
@@ -194,7 +252,7 @@ fun ServiceCard(
                         icon = Icons.Default.Delete,
                         isDelete = true,
                         modifier = Modifier.weight(1f),
-                        onClick = {}
+                        onClick = onDelete
                     )
                 }
             }
@@ -219,7 +277,8 @@ fun ListaServiciosViewPreview() {
             servicios = sampleServices,
             navController = NavController(LocalContext.current),
             openDrawer = {},
-            onEditServicio = {}
+            onEditServicio = {},
+            onDeleteServicio = {}
         )
     }
 }

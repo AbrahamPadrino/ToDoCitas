@@ -120,6 +120,21 @@ fun NavManager() {
                     onDeleteCliente = { cliente -> clientesViewModel.eliminarCliente(cliente) }
                 )
             }
+
+            composable(Views.ListaServiciosView.route) {
+                ListaServiciosView(
+                    onBack = { navController.popBackStack() },
+                    onAddNewService = { navController.navigate(Views.NuevoServicioView.route) },
+                    servicios = serviciosViewModel.serviciosState.listaServicios,
+                    navController = navController,
+                    openDrawer = { scope.launch { drawerState.open() } },
+                    onEditServicio = { servicio ->
+                        navController.navigate(Views.NuevoServicioView.route + "?servicioId=${servicio.id}")
+                    },
+                    onDeleteServicio = { servicio -> serviciosViewModel.eliminarServicio(servicio) }
+                )
+            }
+
             // Se añade un argumento opcional "clienteId". Si no se pasa, es una creación. Si se pasa, es una edición.
             composable(
                 route = Views.NuevoClienteView.route + "?clienteId={clienteId}",
@@ -141,18 +156,6 @@ fun NavManager() {
                 )
             }
 
-            composable(Views.ListaServiciosView.route) {
-                ListaServiciosView(
-                    onBack = { navController.popBackStack() },
-                    onAddNewService = { navController.navigate(Views.NuevoServicioView.route) },
-                    servicios = serviciosViewModel.serviciosState.listaServicios,
-                    navController = navController,
-                    openDrawer = { scope.launch { drawerState.open() } },
-                    onEditServicio = { servicio ->
-                        navController.navigate(Views.NuevoServicioView.route + "?servicioId=${servicio.id}")
-                    }
-                )
-            }
             composable(
                 route = Views.NuevoServicioView.route + "?servicioId={servicioId}",
                 arguments = listOf(navArgument("servicioId") {
@@ -172,30 +175,35 @@ fun NavManager() {
                     serviciosViewModel = serviciosViewModel
                 )
             }
+
             composable(Views.ListaCitasView.route) {
                 ListaCitasView(
                     navController = navController,
                     openDrawer = { scope.launch { drawerState.open() } }
                 )
             }
+
             composable(Views.NuevaCitaView.route) {
                 NuevaCitaView(
                     navController = navController,
                     openDrawer = { scope.launch { drawerState.open() } }
                 )
             }
+
             composable(Views.ReporteTicketView.route) {
                 ReporteTicketView(
                     navController = navController,
                     openDrawer = { scope.launch { drawerState.open() } }
                 )
             }
+
             composable(Views.ReporteSemanalView.route) {
                 ReporteSemanalView(
                     navController = navController,
                     openDrawer = { scope.launch { drawerState.open() } }
                 )
             }
+
             composable(Views.ReporteMensualView.route) {
                 ReporteMensualView(
                     navController = navController,

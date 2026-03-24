@@ -37,6 +37,9 @@ import androidx.core.net.toUri // Import para convertir String a Uri
 import coil.compose.AsyncImage
 import android.content.Intent // Import para el Intent
 import android.net.Uri // Import para la URI del teléfono
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -193,7 +196,13 @@ fun ListaClientesView(
             },
             text = {
                 Text(
-                    text = "¿Seguro deseas eliminar a ${cliente.nombre} ${cliente.apellido}? Esta acción no se puede deshacer.",
+                    text = buildAnnotatedString {
+                        append("¿Seguro deseas eliminar a ")
+                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                            append("${cliente.nombre} ${cliente.apellido}")
+                        }
+                        append("? Esta acción no se puede deshacer.")
+                    },
                     color = TextSecondary
                 )
             },

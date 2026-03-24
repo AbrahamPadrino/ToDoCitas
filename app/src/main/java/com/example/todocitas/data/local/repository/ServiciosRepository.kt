@@ -22,7 +22,5 @@ class ServiciosRepository @Inject constructor(private val serviciosDao: Servicio
         serviciosDao.updateServicio(servicio)
     }
 
-    suspend fun deleteServicio(servicio: Servicio) {
-        serviciosDao.deleteServicio(servicio)
-    }
+    suspend fun deleteServicio(servicio: Servicio) = serviciosDao.deleteServicio(servicio)
 }
