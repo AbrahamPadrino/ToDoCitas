@@ -1,16 +1,27 @@
 package com.example.todocitas.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -19,8 +30,10 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.todocitas.ui.theme.BorderDark
@@ -125,4 +138,98 @@ fun SearchBar(
         ),
         singleLine = true
     )
+}
+
+/**
+ * Componente reutilizable
+ */
+// Controles de Paginación
+@Composable
+fun PaginacionControles(
+    paginaActual: Int, totalPaginas: Int,
+    onCambiarPagina: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp, horizontal = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        // Ir a la página ANTERIOR
+        IconButton(
+            onClick = { onCambiarPagina(paginaActual - 1) },
+            // El botón se deshabilita si está en la primera página
+            enabled = paginaActual > 1
+        ) {
+            Icon(
+                imageVector = Icons.Default.KeyboardArrowLeft,
+                contentDescription = "Página anterior",
+                // El color cambia si el botón está deshabilitado para dar feedback visual
+                tint = if (paginaActual > 1) Primary else TextSecondary.copy(alpha = 0.5f)
+            )
+        }
+
+        Spacer(modifier = Modifier.width(24.dp))
+        // Texto que indica la página actual y el total
+        Text(
+            text = "Página $paginaActual de $totalPaginas",
+            fontWeight = FontWeight.Bold,
+            color = TextSecondary,
+            fontSize = 16.sp
+        )
+        Spacer(modifier = Modifier.width(24.dp))
+        // Botón para ir a la página SIGUIENTE
+        IconButton(
+            onClick = { onCambiarPagina(paginaActual + 1) },
+            // El botón se deshabilita si está en la última página
+            enabled = paginaActual < totalPaginas
+        ) {
+            Icon(
+                imageVector = Icons.Default.KeyboardArrowRight,
+                contentDescription = "Página siguiente",
+                tint = if (paginaActual < totalPaginas) Primary else TextSecondary.copy(alpha = 0.5f)
+            )
+        }
+    }
+}
+
+// Lista sin mas registos
+@Composable
+fun EmptyState(isEndOfList: Boolean = false) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(if (isEndOfList) 60.dp else 80.dp)
+                .clip(CircleShape)
+                .background(CardDark),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                Icons.Default.Person,
+                contentDescription = null,
+                tint = TextSecondary,
+                modifier = Modifier.size(if (isEndOfList) 30.dp else 40.dp)
+            )
+        }
+        Text(
+            text = "No hay registros disponibles.",
+            fontWeight = FontWeight.Bold,
+            color = Color.White,
+            fontSize = 18.sp
+        )
+        Text(
+            text = "Presiona '+' para agregar un nuevo registro.",
+            color = TextSecondary,
+            fontSize = 14.sp,
+            textAlign = TextAlign.Center
+        )
+    }
 }

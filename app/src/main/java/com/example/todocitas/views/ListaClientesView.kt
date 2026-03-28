@@ -40,6 +40,8 @@ import android.net.Uri // Import para la URI del teléfono
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
+import com.example.todocitas.components.EmptyState
+import com.example.todocitas.components.PaginacionControles
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -368,99 +370,9 @@ fun ActionButton(
     }
 }
 
-/**
- * Componente reutilizable
- */
-// Controles de Paginación
-@Composable
-fun PaginacionControles(
-    paginaActual: Int, totalPaginas: Int,
-    onCambiarPagina: (Int) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp, horizontal = 16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
-    ) {
-        // Ir a la página ANTERIOR
-        IconButton(
-            onClick = { onCambiarPagina(paginaActual - 1) },
-            // El botón se deshabilita si está en la primera página
-            enabled = paginaActual > 1
-        ) {
-            Icon(
-                imageVector = Icons.Default.KeyboardArrowLeft,
-                contentDescription = "Página anterior",
-                // El color cambia si el botón está deshabilitado para dar feedback visual
-                tint = if (paginaActual > 1) Primary else TextSecondary.copy(alpha = 0.5f)
-            )
-        }
 
-        Spacer(modifier = Modifier.width(24.dp))
-        // Texto que indica la página actual y el total
-        Text(
-            text = "Página $paginaActual de $totalPaginas",
-            fontWeight = FontWeight.Bold,
-            color = TextSecondary,
-            fontSize = 16.sp
-        )
-        Spacer(modifier = Modifier.width(24.dp))
-        // Botón para ir a la página SIGUIENTE
-        IconButton(
-            onClick = { onCambiarPagina(paginaActual + 1) },
-            // El botón se deshabilita si está en la última página
-            enabled = paginaActual < totalPaginas
-        ) {
-            Icon(
-                imageVector = Icons.Default.KeyboardArrowRight,
-                contentDescription = "Página siguiente",
-                tint = if (paginaActual < totalPaginas) Primary else TextSecondary.copy(alpha = 0.5f)
-            )
-        }
-    }
-}
 
-// Lista sin mas registos
-@Composable
-fun EmptyState(isEndOfList: Boolean = false) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .size(if (isEndOfList) 60.dp else 80.dp)
-                .clip(CircleShape)
-                .background(CardDark),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                Icons.Default.Person,
-                contentDescription = null,
-                tint = TextSecondary,
-                modifier = Modifier.size(if (isEndOfList) 30.dp else 40.dp)
-            )
-        }
-        Text(
-            text = "No hay más clientes",
-            fontWeight = FontWeight.Bold,
-            color = Color.White,
-            fontSize = 18.sp
-        )
-        Text(
-            text = "Presiona '+' para agregar un nuevo cliente.",
-            color = TextSecondary,
-            fontSize = 14.sp,
-            textAlign = TextAlign.Center
-        )
-    }
-}
+
 
 // --- Preview para Android Studio ---
 @Preview(showBackground = true, backgroundColor = 0xFF101C22)

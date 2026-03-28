@@ -30,6 +30,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.todocitas.components.EmptyState
+import com.example.todocitas.components.PaginacionControles
 import com.example.todocitas.components.SearchBar
 import com.example.todocitas.data.local.entities.Servicio
 import com.example.todocitas.ui.theme.*
@@ -52,6 +54,7 @@ fun ListaServiciosView(
 ) {
     var expandedCardId by remember { mutableStateOf<Int?>(null) }
     var servicioAEliminar by remember { mutableStateOf<Servicio?>(null) }
+    // Resetear los parametros de la paginación
 
     LaunchedEffect(paginaActual) {
         // Al cambiar de página, cierra cualquier tarjeta que estuviera expandida.
@@ -118,23 +121,32 @@ fun ListaServiciosView(
                     .padding(horizontal = 16.dp, vertical = 8.dp)
             )
             // Lista de servicios
+            Box(modifier = Modifier.weight(1f)) {
+                if (servicios.isEmpty() && searchQuery.isBlank()) {
+                    EmptyState()
+                } else {
+                    LazyColumn(
+                        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 80.dp), // Padding para el FAB
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(servicios.filter { it.nombre.contains(searchQuery, ignoreCase = true) }) { servicio ->
+                            ServiceCard(
+                                servicio = servicio,
+                                isExpanded = expandedCardId == servicio.id,
+                                onExpand = {
+                                    expandedCardId = if (expandedCardId == servicio.id) null else servicio.id
+                                },
 
-            LazyColumn(
-                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 80.dp), // Padding para el FAB
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(servicios.filter { it.nombre.contains(searchQuery, ignoreCase = true) }) { servicio ->
-                    ServiceCard(
-                        servicio = servicio,
-                        isExpanded = expandedCardId == servicio.id,
-                        onExpand = {
-                            expandedCardId = if (expandedCardId == servicio.id) null else servicio.id
-                        },
+                                onEdit = { onEditServicio(servicio) },
 
-                        onEdit = { onEditServicio(servicio) },
-
-                        onDelete = { servicioAEliminar = servicio }
-                    )
+                                onDelete = { servicioAEliminar = servicio }
+                            )
+                        }
+                        // Mensaje "No hay más registros" al final de la lista
+                        item {
+                            EmptyState(isEndOfList = true)
+                        }
+                    }
                 }
             }
             if (totalPaginas > 1) {

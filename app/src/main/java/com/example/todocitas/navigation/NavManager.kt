@@ -74,12 +74,10 @@ fun NavManager() {
 
         // Recoge la lista de clientes paginada
         val listaDeClientesPaginada by clientesViewModel.clientesPaginados.collectAsState()
-        val listaDeServiciosPaginada by serviciosViewModel.serviciosPaginados.collectAsState()
-
         // Recoge la información de paginación
-        val paginaActual by clientesViewModel.paginaActual.collectAsState()
-        val totalPaginas by clientesViewModel.totalPaginas.collectAsState()
-        val searchQuery by clientesViewModel.searchQuery.collectAsState()
+        val paginaActualClientes by clientesViewModel.paginaActual.collectAsState()
+        val totalPaginasClientes by clientesViewModel.totalPaginas.collectAsState()
+        val searchQueryClientes by clientesViewModel.searchQuery.collectAsState()
 
         NavHost(
             navController = navController,
@@ -102,12 +100,12 @@ fun NavManager() {
                     onBack = { navController.popBackStack() },
                     onAddNewClient = { navController.navigate(Views.NuevoClienteView.route) },
                     clientes = listaDeClientesPaginada,
-                    paginaActual = paginaActual,
-                    totalPaginas = totalPaginas,
+                    paginaActual = paginaActualClientes,
+                    totalPaginas = totalPaginasClientes,
                     onCambiarPagina = { nuevaPagina ->
                         clientesViewModel.cambiarPagina(nuevaPagina)
                     },
-                    searchQuery = searchQuery,
+                    searchQuery = searchQueryClientes,
                     onSearchQueryChange = { newQuery ->
                         clientesViewModel.onSearchQueryChange(
                             newQuery
@@ -124,16 +122,23 @@ fun NavManager() {
             }
 
             composable(Views.ListaServiciosView.route) {
+                // 1. Estados específicos de Servicios
+                val serviciosPaginados by serviciosViewModel.serviciosPaginados.collectAsState()
+                val paginaActualServicios by serviciosViewModel.paginaActual.collectAsState()
+                val totalPaginasServicios by serviciosViewModel.totalPaginas.collectAsState()
+                val searchServicios by serviciosViewModel.searchQuery.collectAsState()
+
                 ListaServiciosView(
                     onBack = { navController.popBackStack() },
                     onAddNewService = { navController.navigate(Views.NuevoServicioView.route) },
-                    servicios = listaDeServiciosPaginada,
-                    paginaActual = paginaActual,
-                    totalPaginas = totalPaginas,
+                    servicios = serviciosPaginados,
+                    // 2. Parámetros reseteados al contexto de servicios
+                    paginaActual = paginaActualServicios,
+                    totalPaginas = totalPaginasServicios,
                     onCambiarPagina = { nuevaPagina ->
                         serviciosViewModel.cambiarPagina(nuevaPagina)
                     },
-                    searchQuery = searchQuery,
+                    searchQuery = searchServicios,
                     onSearchQueryChange = { newQuery ->
                         serviciosViewModel.onSearchQueryChange(
                             newQuery
