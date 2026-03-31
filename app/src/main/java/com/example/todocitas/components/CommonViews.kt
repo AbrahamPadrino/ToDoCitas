@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FormatListNumbered
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Person
@@ -213,7 +214,7 @@ fun EmptyState(isEndOfList: Boolean = false) {
             contentAlignment = Alignment.Center
         ) {
             Icon(
-                Icons.Default.Person,
+                Icons.Default.FormatListNumbered,
                 contentDescription = null,
                 tint = TextSecondary,
                 modifier = Modifier.size(if (isEndOfList) 30.dp else 40.dp)

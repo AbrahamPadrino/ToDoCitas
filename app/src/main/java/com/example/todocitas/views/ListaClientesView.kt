@@ -166,8 +166,10 @@ fun ListaClientesView(
                             )
                         }
                         // Mensaje "No hay más clientes" al final de la lista
-                        item {
-                            //EmptyState(isEndOfList = true)
+                        if (paginaActual == totalPaginas) {
+                            item {
+                                EmptyState(isEndOfList = true)
+                            }
                         }
                     }
                 }

@@ -143,8 +143,10 @@ fun ListaServiciosView(
                             )
                         }
                         // Mensaje "No hay más registros" al final de la lista
-                        item {
-                            EmptyState(isEndOfList = true)
+                        if (paginaActual == totalPaginas) {
+                            item {
+                                EmptyState(isEndOfList = true)
+                            }
                         }
                     }
                 }
