@@ -84,7 +84,7 @@ class   ClientesViewModel @Inject constructor(
     val searchQuery = _searchQuery.asStateFlow()
 
     // Registros por página es una constante.
-    private val registrosPorPagina = 5
+    private val registrosPorPagina = 10
 
     // Total de páginas ahora reacciona al "searchQuery".
     @OptIn(ExperimentalCoroutinesApi::class)

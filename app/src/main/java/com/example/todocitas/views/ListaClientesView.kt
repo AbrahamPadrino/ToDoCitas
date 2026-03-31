@@ -94,7 +94,7 @@ fun ListaClientesView(
                 actions = {
                     IconButton(modifier = Modifier.size(48.dp), onClick = onAddNewClient) {
                         Icon(
-                            Icons.Default.AddCircle,
+                            Icons.Default.PersonAdd,
                             contentDescription = "Añadir Cliente",
                             tint = Primary,
                             modifier = Modifier.size(32.dp)

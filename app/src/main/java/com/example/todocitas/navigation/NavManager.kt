@@ -44,6 +44,9 @@ fun NavManager() {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route ?: Views.InicioView.route
 
+    val serviciosViewModel: ServiciosViewModel = hiltViewModel()
+    val clientesViewModel: ClientesViewModel = hiltViewModel()
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
@@ -53,8 +56,16 @@ fun NavManager() {
                 DrawerContent(
                     currentRoute = currentRoute,
                     onNavigate = { route ->
+
+                        // Resetea la página actual de Clientes al pulsar un item del menú
+                        if (route == Views.ListaClientesView.route) {
+                            clientesViewModel.cambiarPagina(1)
+                        }
+                        // Resetea la página actual de Servicios al pulsar un item del menú
+                        if (route == Views.ListaServiciosView.route)
+                            serviciosViewModel.cambiarPagina(1)
+                        // Evita apilar la misma pantalla múltiples veces
                         navController.navigate(route) {
-                            // Evita apilar la misma pantalla múltiples veces
                             launchSingleTop = true
                         }
                         // Cierra el menú después de navegar
@@ -68,10 +79,6 @@ fun NavManager() {
         },
         gesturesEnabled = drawerState.isOpen // Solo permite gestos para abrir/cerrar si está abierto
     ) {
-
-        val serviciosViewModel: ServiciosViewModel = hiltViewModel()
-        val clientesViewModel: ClientesViewModel = hiltViewModel()
-
         // Recoge la lista de clientes paginada
         val listaDeClientesPaginada by clientesViewModel.clientesPaginados.collectAsState()
         // Recoge la información de paginación

@@ -79,7 +79,7 @@ class ServiciosViewModel @Inject constructor (
     private val _searchQuery = MutableStateFlow("")
     val searchQuery = _searchQuery.asStateFlow()
 
-    private val registrosPorPagina = 5
+    private val registrosPorPagina = 10
 
     // Total de páginas reacciona al "searchQuery".
     @OptIn(ExperimentalCoroutinesApi::class)
