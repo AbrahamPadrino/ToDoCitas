@@ -189,7 +189,7 @@ fun NuevoServicioView(
                 }
 
                 // Espaciador para dejar sitio a los botones flotantes
-                Spacer(modifier = Modifier.height(200.dp))
+                Spacer(modifier = Modifier.height(12.dp))
             }
             // Footer con botones y gradiente
             Box(

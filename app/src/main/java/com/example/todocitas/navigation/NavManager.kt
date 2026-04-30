@@ -211,7 +211,8 @@ fun NavManager() {
             composable(Views.NuevaCitaView.route) {
                 NuevaCitaView(
                     navController = navController,
-                    openDrawer = { scope.launch { drawerState.open() } }
+                    openDrawer = { scope.launch { drawerState.open() } },
+                    clientesViewModel = clientesViewModel
                 )
             }
 

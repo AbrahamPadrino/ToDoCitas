@@ -314,10 +314,9 @@ fun NuevoClienteView(
 
                     )
                 }
-
-                Spacer(modifier = Modifier.height(160.dp))
-
+                Spacer(modifier = Modifier.height(12.dp))
             }
+
             // FOOTER
             Box(
                 modifier = Modifier
@@ -390,7 +389,7 @@ fun NuevoClienteView(
                             contentDescription = null,
                             modifier = Modifier.size(20.dp)
                         )
-                        Spacer(modifier = Modifier.width(6.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             if (clienteId == -1) "Guardar Cliente" else "Actualizar Cliente",
                             fontWeight = FontWeight.Bold,
